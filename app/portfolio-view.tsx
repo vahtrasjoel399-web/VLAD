@@ -326,12 +326,6 @@ export default function PortfolioView({
         {page === 'works' ? (
           <>
             <section className="hero">
-              <div className="hero-coordinate" aria-hidden="true">
-                FORMAT / 16:9<br />SIGNAL / RGB
-              </div>
-              <div className="eyebrow">
-                {t.heroPrimary} <span>{t.heroSecondary}</span>
-              </div>
               <h1 ref={title} tabIndex={-1}>
                 <span className="title-mask">
                   <span>{t.heroLineOne}</span>
@@ -354,11 +348,6 @@ export default function PortfolioView({
                     ? content.descriptionRu || content.description
                     : content.description}
                 </p>
-                <p>
-                  {locale === 'ru'
-                    ? content.rolesRu || content.roles
-                    : content.roles}
-                </p>
                 <a href="#works">
                   {t.viewWork} <ArrowDown size={15} />
                 </a>
@@ -366,8 +355,8 @@ export default function PortfolioView({
             </section>
             <section id="works" aria-label={t.worksAria}>
               <div className="section-label">
-                <span>01 / {t.selectedSection}</span>
-                <span>{content.demo ? t.demoCollection : t.collection}</span>
+                <span>{t.works}</span>
+                <span>{String(works.length).padStart(2, '0')}</span>
               </div>
               <div className="grid">
                 {works.map((work, index) => (
@@ -418,8 +407,7 @@ export default function PortfolioView({
                 aria-label={content.demo ? t.demoClientsAria : t.clientsAria}
               >
                 <div className="section-label">
-                  <span>02 / {t.featured}</span>
-                  <span>{content.demo ? t.demoLogos : t.inFrame}</span>
+                  <span>{locale === 'ru' ? 'КЛИЕНТЫ' : 'CLIENTS'}</span>
                 </div>
                 <div className="marquee">
                   <div className="marquee-track">
@@ -434,27 +422,16 @@ export default function PortfolioView({
               </section>
             )}
             <section className="contact-teaser reveal">
-              <span className="eyebrow">{t.teaserEyebrow}</span>
               <a href="/contacts" onClick={(e) => navigate(e, 'contacts')}>
                 <span>
-                  {t.teaserOne}
-                  <br />
-                  <em>{t.teaserEmphasis}</em>
-                  {t.teaserEnd}
+                  {locale === 'ru' ? 'ОБСУДИМ?' : 'LET’S TALK.'}
                 </span>
                 <ArrowUpRight strokeWidth={0.8} />
               </a>
-              <div className="teaser-bottom">
-                <span>{t.idea}</span>
-                <span>{t.contactCta}</span>
-              </div>
             </section>
           </>
         ) : (
           <section className="contacts">
-            <div className="eyebrow">
-              {t.contactEyebrow} <span>{t.contactEyebrowSub}</span>
-            </div>
             <div className="contact-heading">
               <h1 ref={title} tabIndex={-1}>
                 <span className="title-mask">
@@ -473,19 +450,12 @@ export default function PortfolioView({
               />
             </div>
             <div className="contact-details">
-              <p>
-                {t.contactLeadOne}
-                <br />
-                {t.contactLeadTwo}
-                <br />
-                <em>{t.contactLeadThree}</em>
-              </p>
+              <p>{locale === 'ru' ? 'Напишите напрямую.' : 'Get in touch.'}</p>
               <div className="contact-links">
-                <span className="eyebrow">{t.choose}</span>
                 <div className="contact-methods">
                   <div className="contact-method">
                     <span className="contact-icon" aria-hidden="true">
-                      <img src="/media/contact-icons/instagram-chrome.png" alt="" width="96" height="96" />
+                      <img src="/media/contact-icons/instagram-chrome-transparent.png" alt="" width="96" height="96" />
                     </span>
                     <span className="contact-meta">INSTAGRAM</span>
                     {instagramUrl ? (
@@ -499,7 +469,7 @@ export default function PortfolioView({
                   </div>
                   <div className="contact-method">
                     <span className="contact-icon" aria-hidden="true">
-                      <img src="/media/contact-icons/youtube-chrome.png" alt="" width="96" height="96" />
+                      <img src="/media/contact-icons/youtube-chrome-transparent.png" alt="" width="96" height="96" />
                     </span>
                     <span className="contact-meta">YOUTUBE</span>
                     {youtubeUrl ? (
@@ -513,7 +483,7 @@ export default function PortfolioView({
                   </div>
                   <div className="contact-method">
                     <span className="contact-icon" aria-hidden="true">
-                      <img src="/media/contact-icons/phone-chrome.png" alt="" width="96" height="96" />
+                      <img src="/media/contact-icons/phone-chrome-transparent.png" alt="" width="96" height="96" />
                     </span>
                     <span className="contact-meta">{t.phone}</span>
                     {phoneHref ? (
@@ -527,7 +497,7 @@ export default function PortfolioView({
                   </div>
                   <div className="contact-method">
                     <span className="contact-icon" aria-hidden="true">
-                      <img src="/media/contact-icons/email-chrome.png" alt="" width="96" height="96" />
+                      <img src="/media/contact-icons/email-chrome-transparent.png" alt="" width="96" height="96" />
                     </span>
                     <span className="contact-meta">EMAIL</span>
                     {content.email ? (
@@ -586,9 +556,7 @@ export default function PortfolioView({
         )}
       </div>
       <footer>
-        <span>
-          {content.name} / {t.creatorLabel}
-        </span>
+        <span>{content.name}</span>
         <button
           className="motion-control"
           onClick={toggleMotion}
@@ -598,10 +566,7 @@ export default function PortfolioView({
           {paused || reduced ? <Play size={12} /> : <Pause size={12} />}{' '}
           {reduced ? t.reduced : paused ? t.motionOn : t.motionOff}
         </button>
-        <span>
-          {content.demo ? 'DEMO EDITION' : 'INDEPENDENT VISION'} ©{' '}
-          {new Date().getFullYear()}
-        </span>
+        <span>© {new Date().getFullYear()}</span>
       </footer>
     </main>
   );
