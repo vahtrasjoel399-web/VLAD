@@ -20,6 +20,7 @@ export default {
     },
     { name: 'roles', title: 'Направления работы', type: 'string' },
     { name: 'email', title: 'Email', type: 'string' },
+    { name: 'phone', title: 'Телефон', type: 'string' },
     {
       name: 'socials',
       title: 'Соцсети и мессенджеры',

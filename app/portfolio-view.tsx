@@ -8,6 +8,9 @@ import {
   Check,
   Pause,
   Play,
+  Instagram,
+  Phone,
+  Mail,
 } from 'lucide-react';
 import { safeLink, type Portfolio } from '@/lib/content';
 import VideoCard from './video-card';
@@ -30,6 +33,13 @@ export default function PortfolioView({
   const title = useRef<HTMLHeadingElement>(null);
   const works = [...content.works].sort((a, b) => a.order - b.order);
   const logos = [...content.logos].sort((a, b) => a.order - b.order);
+  const instagram = content.socials.find((social) =>
+    social.name.toLowerCase().includes('instagram'),
+  );
+  const instagramUrl = safeLink(instagram?.url);
+  const phoneHref = content.phone
+    ? `tel:${content.phone.replace(/[^+\d]/g, '')}`
+    : undefined;
   useEffect(() => {
     const media = matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setReduced(media.matches);
@@ -324,30 +334,70 @@ export default function PortfolioView({
                 <em>рассказать её.</em>
               </p>
               <div className="contact-links">
-                <span className="eyebrow">НАЧНЁМ С ПИСЬМА</span>
-                {content.email ? (
-                  <div className="email-row">
-                    <a href={`mailto:${content.email}`}>
-                      {content.email}
-                      <ArrowUpRight />
-                    </a>
-                    <button aria-label="Скопировать email" onClick={copy}>
-                      {copyState === 'Email скопирован' ? (
-                        <Check size={19} />
-                      ) : (
-                        <Copy size={19} />
-                      )}
-                    </button>
+                <span className="eyebrow">ВЫБЕРИТЕ УДОБНЫЙ СПОСОБ</span>
+                <div className="contact-methods">
+                  <div className="contact-method">
+                    <span className="contact-icon" aria-hidden="true">
+                      <Instagram size={21} />
+                    </span>
+                    <span className="contact-meta">INSTAGRAM</span>
+                    {instagramUrl ? (
+                      <a href={instagramUrl} target="_blank" rel="noreferrer">
+                        {instagram?.name || 'Instagram'}
+                        <ArrowUpRight size={18} />
+                      </a>
+                    ) : (
+                      <span className="contact-unset">Не добавлен</span>
+                    )}
                   </div>
-                ) : (
-                  <p className="unset-contact">Email пока не добавлен</p>
-                )}
+                  <div className="contact-method">
+                    <span className="contact-icon" aria-hidden="true">
+                      <Phone size={21} />
+                    </span>
+                    <span className="contact-meta">ТЕЛЕФОН</span>
+                    {phoneHref ? (
+                      <a href={phoneHref}>
+                        {content.phone}
+                        <ArrowUpRight size={18} />
+                      </a>
+                    ) : (
+                      <span className="contact-unset">Не добавлен</span>
+                    )}
+                  </div>
+                  <div className="contact-method">
+                    <span className="contact-icon" aria-hidden="true">
+                      <Mail size={21} />
+                    </span>
+                    <span className="contact-meta">EMAIL</span>
+                    {content.email ? (
+                      <div className="contact-email">
+                        <a href={`mailto:${content.email}`}>
+                          {content.email}
+                          <ArrowUpRight size={18} />
+                        </a>
+                        <button aria-label="Скопировать email" onClick={copy}>
+                          {copyState === 'Email скопирован' ? (
+                            <Check size={17} />
+                          ) : (
+                            <Copy size={17} />
+                          )}
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="contact-unset">Не добавлен</span>
+                    )}
+                  </div>
+                </div>
                 <div role="status" className="copy-feedback">
                   {copyState}
                 </div>
                 <div className="socials">
                   {content.socials
-                    .filter((s) => safeLink(s.url))
+                    .filter(
+                      (s) =>
+                        safeLink(s.url) &&
+                        !s.name.toLowerCase().includes('instagram'),
+                    )
                     .map((s) => (
                       <a
                         key={s.name}
@@ -362,7 +412,7 @@ export default function PortfolioView({
                 </div>
                 {content.demo && (
                   <p className="demo-note">
-                    Демонстрационный режим. Имя, email и соцсети
+                    Демонстрационный режим. Имя, телефон, email и соцсети
                     <br />
                     появятся после добавления ваших данных.
                   </p>
