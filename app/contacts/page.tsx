@@ -9,8 +9,8 @@ export default async function Contacts() {
   } catch {
     return (
       <main className="error-page">
-        <h1>Небольшая пауза.</h1>
-        <a href="/contacts">Попробовать снова ↗</a>
+        <h1>A short pause.</h1>
+        <a href="/contacts">Try again ↗</a>
       </main>
     );
   }

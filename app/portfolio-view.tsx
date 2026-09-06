@@ -8,13 +8,121 @@ import {
   Check,
   Pause,
   Play,
-  Instagram,
-  Phone,
-  Mail,
 } from 'lucide-react';
 import { safeLink, type Portfolio } from '@/lib/content';
 import VideoCard from './video-card';
 type Page = 'works' | 'contacts';
+type Locale = 'en' | 'ru';
+
+const COPY = {
+  en: {
+    skip: 'Skip to content',
+    navLabel: 'Main navigation',
+    works: 'Work',
+    contacts: 'Contact',
+    language: 'Language',
+    heroPrimary: 'INDEPENDENT VIDEO CREATOR',
+    heroSecondary: 'IMAGE / SOUND / FEELING',
+    heroLineOne: 'BEYOND',
+    heroLineTwo: 'THE FRAME.',
+    chromeAlt: 'Sculptural liquid chrome form',
+    viewWork: 'View selected work',
+    selectedSection: 'SELECTED WORK',
+    worksAria: 'Selected work',
+    collection: 'Selected automotive films',
+    demoCollection: 'Demo collection',
+    empty: 'New work is coming soon.',
+    demoText: 'Demo: six frames from the Sintel trailer by Blender Foundation.',
+    demoDisclaimer: 'These are not the creator’s works.',
+    original: 'Original ↗',
+    clientsAria: 'Featured names',
+    demoClientsAria: 'Demo logos',
+    featured: 'FEATURED WITH',
+    demoLogos: 'Demo logos · no collaborations implied',
+    inFrame: 'Names in the frame',
+    teaserEyebrow: 'THE NEXT FRAME IS OURS.',
+    teaserOne: 'LET’S MAKE',
+    teaserEmphasis: 'SOMETHING',
+    teaserEnd: ' MOVE.',
+    idea: 'Have an idea? Let’s give it form.',
+    contactCta: 'START A CONVERSATION ↗',
+    contactEyebrow: '03 / GET IN TOUCH',
+    contactEyebrowSub: 'EVERY GOOD FILM STARTS WITH A CONVERSATION',
+    contactHeadingOne: 'LET’S',
+    contactHeadingTwo: 'TALK.',
+    contactChromeAlt: 'Chrome sculpture',
+    contactLeadOne: 'One idea.',
+    contactLeadTwo: 'A thousand ways',
+    contactLeadThree: 'to tell it.',
+    choose: 'CHOOSE WHAT WORKS FOR YOU',
+    phone: 'PHONE',
+    notAdded: 'Not added',
+    copyEmail: 'Copy email',
+    copied: 'Email copied',
+    copyFailed: 'Could not copy. Select the address manually.',
+    demoContact:
+      'Demo mode. Name, phone, email and social links appear after you add them.',
+    back: 'Back to work',
+    reduced: 'Reduced motion',
+    motionOn: 'Enable motion',
+    motionOff: 'Pause motion',
+    creatorLabel: 'VIDEO CREATOR',
+  },
+  ru: {
+    skip: 'К содержимому',
+    navLabel: 'Основная навигация',
+    works: 'Работы',
+    contacts: 'Контакты',
+    language: 'Язык',
+    heroPrimary: 'НЕЗАВИСИМЫЙ ВИДЕОКРЕАТОР',
+    heroSecondary: 'ОБРАЗ / ЗВУК / ОЩУЩЕНИЕ',
+    heroLineOne: 'ЗА',
+    heroLineTwo: 'КАДРОМ.',
+    chromeAlt: 'Скульптурная форма из жидкого хрома',
+    viewWork: 'Смотреть работы',
+    selectedSection: 'ИЗБРАННЫЕ РАБОТЫ',
+    worksAria: 'Избранные работы',
+    collection: 'Избранные автомобильные ролики',
+    demoCollection: 'Демонстрационная коллекция',
+    empty: 'Новые работы скоро появятся здесь.',
+    demoText: 'Демо: шесть кадров из трейлера Sintel от Blender Foundation.',
+    demoDisclaimer: 'Это не работы автора сайта.',
+    original: 'Оригинал ↗',
+    clientsAria: 'Участники проектов',
+    demoClientsAria: 'Демонстрационные логотипы',
+    featured: 'В КАДРЕ С',
+    demoLogos: 'Демо-логотипы · не сотрудничества',
+    inFrame: 'Имена в кадре',
+    teaserEyebrow: 'СЛЕДУЮЩИЙ КАДР — НАШ.',
+    teaserOne: 'СОЗДАДИМ',
+    teaserEmphasis: 'ДВИЖЕНИЕ',
+    teaserEnd: '.',
+    idea: 'Есть идея? Давайте придадим ей форму.',
+    contactCta: 'НАЧАТЬ РАЗГОВОР ↗',
+    contactEyebrow: '03 / СВЯЗАТЬСЯ',
+    contactEyebrowSub: 'КАЖДЫЙ ХОРОШИЙ ФИЛЬМ НАЧИНАЕТСЯ С РАЗГОВОРА',
+    contactHeadingOne: 'ДАВАЙТЕ',
+    contactHeadingTwo: 'ОБСУДИМ.',
+    contactChromeAlt: 'Хромированная скульптура',
+    contactLeadOne: 'Одна идея.',
+    contactLeadTwo: 'Тысяча способов',
+    contactLeadThree: 'рассказать её.',
+    choose: 'ВЫБЕРИТЕ УДОБНЫЙ СПОСОБ',
+    phone: 'ТЕЛЕФОН',
+    notAdded: 'Не добавлен',
+    copyEmail: 'Скопировать email',
+    copied: 'Email скопирован',
+    copyFailed: 'Не удалось скопировать. Выделите адрес вручную.',
+    demoContact:
+      'Демонстрационный режим. Имя, телефон, email и соцсети появятся после добавления данных.',
+    back: 'Вернуться к работам',
+    reduced: 'Уменьшенное движение',
+    motionOn: 'Включить движение',
+    motionOff: 'Остановить движение',
+    creatorLabel: 'ВИДЕОКРЕАТОР',
+  },
+} as const;
+
 export default function PortfolioView({
   content,
   initialPage = 'works',
@@ -30,17 +138,30 @@ export default function PortfolioView({
   const [copyState, setCopyState] = useState('');
   const [transition, setTransition] = useState(0);
   const [saveData, setSaveData] = useState(false);
+  const [locale, setLocale] = useState<Locale>('en');
   const title = useRef<HTMLHeadingElement>(null);
+  const t = COPY[locale];
   const works = [...content.works].sort((a, b) => a.order - b.order);
   const logos = [...content.logos].sort((a, b) => a.order - b.order);
-  const instagram = content.socials.find((social) =>
-    social.name.toLowerCase().includes('instagram'),
+  const instagram = content.socials.find(
+    (social) =>
+      social.name.toLowerCase().includes('instagram') ||
+      social.url.toLowerCase().includes('instagram.com'),
   );
   const instagramUrl = safeLink(instagram?.url);
+  const youtube = content.socials.find(
+    (social) =>
+      social.name.toLowerCase().includes('youtube') ||
+      social.url.toLowerCase().includes('youtube.com') ||
+      social.url.toLowerCase().includes('youtu.be'),
+  );
+  const youtubeUrl = safeLink(youtube?.url);
   const phoneHref = content.phone
     ? `tel:${content.phone.replace(/[^+\d]/g, '')}`
     : undefined;
   useEffect(() => {
+    const savedLocale = localStorage.getItem('smolin-locale');
+    if (savedLocale === 'ru') setLocale('ru');
     const media = matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setReduced(media.matches);
     update();
@@ -71,6 +192,9 @@ export default function PortfolioView({
       document.removeEventListener('visibilitychange', hide);
     };
   }, []);
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
   useEffect(() => {
     const io = new IntersectionObserver(
       (entries) =>
@@ -110,11 +234,16 @@ export default function PortfolioView({
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(content.email);
-      setCopyState('Email скопирован');
+      setCopyState(t.copied);
     } catch {
-      setCopyState('Не удалось скопировать. Выделите адрес вручную.');
+      setCopyState(t.copyFailed);
     }
     setTimeout(() => setCopyState(''), 4000);
+  };
+  const changeLocale = (next: Locale) => {
+    setLocale(next);
+    setCopyState('');
+    localStorage.setItem('smolin-locale', next);
   };
   const toggleMotion = () => {
     const next = !paused;
@@ -150,69 +279,95 @@ export default function PortfolioView({
       className={`${paused || reduced ? 'motion-paused' : ''} page-${page}`}
     >
       <a className="skip-link" href="#main-content">
-        К содержимому
+        {t.skip}
       </a>
       <header>
         <a className="wordmark" href="/" onClick={(e) => navigate(e, 'works')}>
           {content.name}
           <span>®</span>
         </a>
-        <nav aria-label="Основная навигация">
-          <a
-            href="/"
-            aria-current={page === 'works' ? 'page' : undefined}
-            onClick={(e) => navigate(e, 'works')}
-          >
-            Работы <sup>{String(works.length).padStart(2, '0')}</sup>
-          </a>
-          <a
-            href="/contacts"
-            aria-current={page === 'contacts' ? 'page' : undefined}
-            onClick={(e) => navigate(e, 'contacts')}
-          >
-            Контакты <ArrowUpRight size={14} />
-          </a>
-        </nav>
+        <div className="header-actions">
+          <nav aria-label={t.navLabel}>
+            <a
+              href="/"
+              aria-current={page === 'works' ? 'page' : undefined}
+              onClick={(e) => navigate(e, 'works')}
+            >
+              {t.works} <sup>{String(works.length).padStart(2, '0')}</sup>
+            </a>
+            <a
+              href="/contacts"
+              aria-current={page === 'contacts' ? 'page' : undefined}
+              onClick={(e) => navigate(e, 'contacts')}
+            >
+              {t.contacts} <ArrowUpRight size={14} />
+            </a>
+          </nav>
+          <div className="language-switch" aria-label={t.language}>
+            <button
+              type="button"
+              aria-pressed={locale === 'en'}
+              onClick={() => changeLocale('en')}
+            >
+              EN
+            </button>
+            <span>/</span>
+            <button
+              type="button"
+              aria-pressed={locale === 'ru'}
+              onClick={() => changeLocale('ru')}
+            >
+              RU
+            </button>
+          </div>
+        </div>
       </header>
       <div key={transition} className="page-content" id="main-content">
         {page === 'works' ? (
           <>
             <section className="hero">
+              <div className="hero-coordinate" aria-hidden="true">
+                FORMAT / 16:9<br />SIGNAL / RGB
+              </div>
               <div className="eyebrow">
-                INDEPENDENT VIDEO CREATOR <span>IMAGE / SOUND / FEELING</span>
+                {t.heroPrimary} <span>{t.heroSecondary}</span>
               </div>
               <h1 ref={title} tabIndex={-1}>
                 <span className="title-mask">
-                  <span>BEYOND</span>
+                  <span>{t.heroLineOne}</span>
                 </span>
                 <span className="title-mask">
-                  <span className="outline">THE FRAME.</span>
+                  <span className="outline">{t.heroLineTwo}</span>
                 </span>
               </h1>
               <img
                 className="chrome"
                 src="/chrome.webp"
-                alt="Скульптурная форма из жидкого хрома"
+                alt={t.chromeAlt}
                 width="1200"
                 height="800"
                 fetchPriority="high"
               />
               <div className="hero-bottom">
-                <p>{content.description}</p>
-                <p>{content.roles}</p>
+                <p>
+                  {locale === 'ru'
+                    ? content.descriptionRu || content.description
+                    : content.description}
+                </p>
+                <p>
+                  {locale === 'ru'
+                    ? content.rolesRu || content.roles
+                    : content.roles}
+                </p>
                 <a href="#works">
-                  Смотреть работы <ArrowDown size={15} />
+                  {t.viewWork} <ArrowDown size={15} />
                 </a>
               </div>
             </section>
-            <section id="works" aria-label="Избранные работы">
+            <section id="works" aria-label={t.worksAria}>
               <div className="section-label">
-                <span>01 / SELECTED WORK</span>
-                <span>
-                  {content.demo
-                    ? 'Демонстрационная коллекция'
-                    : 'Избранные работы'}
-                </span>
+                <span>01 / {t.selectedSection}</span>
+                <span>{content.demo ? t.demoCollection : t.collection}</span>
               </div>
               <div className="grid">
                 {works.map((work, index) => (
@@ -220,6 +375,7 @@ export default function PortfolioView({
                     key={work.id}
                     work={work}
                     index={index}
+                    locale={locale}
                     active={active === work.id}
                     preview={preview === work.id && !active}
                     canPreview={!paused && !reduced && !saveData && !active}
@@ -234,13 +390,10 @@ export default function PortfolioView({
                   />
                 ))}
               </div>
-              {works.length === 0 && (
-                <p className="empty">Новые работы скоро появятся здесь.</p>
-              )}
+              {works.length === 0 && <p className="empty">{t.empty}</p>}
               {content.demo && (
                 <p className="demo-note">
-                  Демо: шесть кадров одного трейлера «Sintel», Blender
-                  Foundation,{' '}
+                  {t.demoText}{' '}
                   <a
                     href="https://creativecommons.org/licenses/by/3.0/"
                     target="_blank"
@@ -248,13 +401,13 @@ export default function PortfolioView({
                   >
                     CC BY 3.0 ↗
                   </a>
-                  . Это не работы автора сайта.{' '}
+                  . {t.demoDisclaimer}{' '}
                   <a
                     href="https://durian.blender.org/"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Оригинал ↗
+                    {t.original}
                   </a>
                 </p>
               )}
@@ -262,17 +415,11 @@ export default function PortfolioView({
             {logos.length > 0 && (
               <section
                 className="collaborators reveal"
-                aria-label={
-                  content.demo ? 'Демонстрационные логотипы' : 'Клиенты'
-                }
+                aria-label={content.demo ? t.demoClientsAria : t.clientsAria}
               >
                 <div className="section-label">
-                  <span>02 / IN GOOD COMPANY</span>
-                  <span>
-                    {content.demo
-                      ? 'Демо-логотипы · не сотрудничества'
-                      : 'Вместе в кадре'}
-                  </span>
+                  <span>02 / {t.featured}</span>
+                  <span>{content.demo ? t.demoLogos : t.inFrame}</span>
                 </div>
                 <div className="marquee">
                   <div className="marquee-track">
@@ -287,58 +434,58 @@ export default function PortfolioView({
               </section>
             )}
             <section className="contact-teaser reveal">
-              <span className="eyebrow">СЛЕДУЮЩИЙ КАДР — НАШ.</span>
+              <span className="eyebrow">{t.teaserEyebrow}</span>
               <a href="/contacts" onClick={(e) => navigate(e, 'contacts')}>
                 <span>
-                  LET’S MAKE
+                  {t.teaserOne}
                   <br />
-                  <em>SOMETHING</em> MOVE.
+                  <em>{t.teaserEmphasis}</em>
+                  {t.teaserEnd}
                 </span>
                 <ArrowUpRight strokeWidth={0.8} />
               </a>
               <div className="teaser-bottom">
-                <span>Есть идея? Давайте придадим ей форму.</span>
-                <span>ПЕРЕЙТИ К КОНТАКТАМ ↗</span>
+                <span>{t.idea}</span>
+                <span>{t.contactCta}</span>
               </div>
             </section>
           </>
         ) : (
           <section className="contacts">
             <div className="eyebrow">
-              03 / GET IN TOUCH{' '}
-              <span>EVERY GOOD FILM STARTS WITH A CONVERSATION</span>
+              {t.contactEyebrow} <span>{t.contactEyebrowSub}</span>
             </div>
             <div className="contact-heading">
               <h1 ref={title} tabIndex={-1}>
                 <span className="title-mask">
-                  <span>LET’S</span>
+                  <span>{t.contactHeadingOne}</span>
                 </span>
                 <span className="title-mask">
-                  <span className="outline">TALK.</span>
+                  <span className="outline">{t.contactHeadingTwo}</span>
                 </span>
               </h1>
               <img
                 className="contact-chrome"
                 src="/chrome.webp"
-                alt="Хромированная скульптура"
+                alt={t.contactChromeAlt}
                 width="1200"
                 height="800"
               />
             </div>
             <div className="contact-details">
               <p>
-                Одна идея.
+                {t.contactLeadOne}
                 <br />
-                Тысяча способов
+                {t.contactLeadTwo}
                 <br />
-                <em>рассказать её.</em>
+                <em>{t.contactLeadThree}</em>
               </p>
               <div className="contact-links">
-                <span className="eyebrow">ВЫБЕРИТЕ УДОБНЫЙ СПОСОБ</span>
+                <span className="eyebrow">{t.choose}</span>
                 <div className="contact-methods">
                   <div className="contact-method">
                     <span className="contact-icon" aria-hidden="true">
-                      <Instagram size={21} />
+                      <img src="/media/contact-icons/instagram-chrome.png" alt="" width="96" height="96" />
                     </span>
                     <span className="contact-meta">INSTAGRAM</span>
                     {instagramUrl ? (
@@ -347,26 +494,40 @@ export default function PortfolioView({
                         <ArrowUpRight size={18} />
                       </a>
                     ) : (
-                      <span className="contact-unset">Не добавлен</span>
+                      <span className="contact-unset">{t.notAdded}</span>
                     )}
                   </div>
                   <div className="contact-method">
                     <span className="contact-icon" aria-hidden="true">
-                      <Phone size={21} />
+                      <img src="/media/contact-icons/youtube-chrome.png" alt="" width="96" height="96" />
                     </span>
-                    <span className="contact-meta">ТЕЛЕФОН</span>
+                    <span className="contact-meta">YOUTUBE</span>
+                    {youtubeUrl ? (
+                      <a href={youtubeUrl} target="_blank" rel="noreferrer">
+                        {youtube?.name || 'YouTube'}
+                        <ArrowUpRight size={18} />
+                      </a>
+                    ) : (
+                      <span className="contact-unset">{t.notAdded}</span>
+                    )}
+                  </div>
+                  <div className="contact-method">
+                    <span className="contact-icon" aria-hidden="true">
+                      <img src="/media/contact-icons/phone-chrome.png" alt="" width="96" height="96" />
+                    </span>
+                    <span className="contact-meta">{t.phone}</span>
                     {phoneHref ? (
                       <a href={phoneHref}>
                         {content.phone}
                         <ArrowUpRight size={18} />
                       </a>
                     ) : (
-                      <span className="contact-unset">Не добавлен</span>
+                      <span className="contact-unset">{t.notAdded}</span>
                     )}
                   </div>
                   <div className="contact-method">
                     <span className="contact-icon" aria-hidden="true">
-                      <Mail size={21} />
+                      <img src="/media/contact-icons/email-chrome.png" alt="" width="96" height="96" />
                     </span>
                     <span className="contact-meta">EMAIL</span>
                     {content.email ? (
@@ -375,8 +536,8 @@ export default function PortfolioView({
                           {content.email}
                           <ArrowUpRight size={18} />
                         </a>
-                        <button aria-label="Скопировать email" onClick={copy}>
-                          {copyState === 'Email скопирован' ? (
+                        <button aria-label={t.copyEmail} onClick={copy}>
+                          {copyState === t.copied ? (
                             <Check size={17} />
                           ) : (
                             <Copy size={17} />
@@ -384,7 +545,7 @@ export default function PortfolioView({
                         </button>
                       </div>
                     ) : (
-                      <span className="contact-unset">Не добавлен</span>
+                      <span className="contact-unset">{t.notAdded}</span>
                     )}
                   </div>
                 </div>
@@ -396,7 +557,8 @@ export default function PortfolioView({
                     .filter(
                       (s) =>
                         safeLink(s.url) &&
-                        !s.name.toLowerCase().includes('instagram'),
+                        !s.name.toLowerCase().includes('instagram') &&
+                        !s.url.toLowerCase().includes('instagram.com'),
                     )
                     .map((s) => (
                       <a
@@ -410,13 +572,7 @@ export default function PortfolioView({
                       </a>
                     ))}
                 </div>
-                {content.demo && (
-                  <p className="demo-note">
-                    Демонстрационный режим. Имя, телефон, email и соцсети
-                    <br />
-                    появятся после добавления ваших данных.
-                  </p>
-                )}
+                {content.demo && <p className="demo-note">{t.demoContact}</p>}
               </div>
             </div>
             <a
@@ -424,13 +580,15 @@ export default function PortfolioView({
               href="/"
               onClick={(e) => navigate(e, 'works')}
             >
-              Вернуться к работам <ArrowRight size={16} />
+              {t.back} <ArrowRight size={16} />
             </a>
           </section>
         )}
       </div>
       <footer>
-        <span>{content.name} / VIDEO CREATOR</span>
+        <span>
+          {content.name} / {t.creatorLabel}
+        </span>
         <button
           className="motion-control"
           onClick={toggleMotion}
@@ -438,11 +596,7 @@ export default function PortfolioView({
           disabled={reduced}
         >
           {paused || reduced ? <Play size={12} /> : <Pause size={12} />}{' '}
-          {reduced
-            ? 'Уменьшенное движение'
-            : paused
-              ? 'Включить движение'
-              : 'Остановить движение'}
+          {reduced ? t.reduced : paused ? t.motionOn : t.motionOff}
         </button>
         <span>
           {content.demo ? 'DEMO EDITION' : 'INDEPENDENT VISION'} ©{' '}

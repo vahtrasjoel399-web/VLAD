@@ -1,112 +1,129 @@
 {
-  "name": "FRAME",
-  "demo": true,
-  "description": "Создаю образы.\nОставляю ощущения.",
-  "roles": "Режиссура · Съёмка · Монтаж",
+  "name": "SMOLIN.FX",
+  "demo": false,
+  "description": "Motion in focus.\nEmotion in every frame.",
+  "descriptionRu": "Движение в фокусе.\nЭмоция в каждом кадре.",
+  "roles": "Automotive films · Reels · Editing",
+  "rolesRu": "Автомобильные ролики · Reels · Монтаж",
   "email": "",
   "phone": "",
-  "socials": [],
+  "socials": [
+    {
+      "name": "@smolin.fx",
+      "url": "https://www.instagram.com/smolin.fx/"
+    },
+    {
+      "name": "YouTube",
+      "url": ""
+    }
+  ],
   "works": [
     {
-      "id": "sintel-01",
-      "title": "Sintel — The journey",
-      "client": "Blender Foundation",
-      "kind": "Open movie · Демо",
+      "id": "statement-motion",
+      "title": "What's Up With All That Movement?",
+      "titleRu": "Что там за движение?",
+      "client": "Statement.ee",
+      "kind": "Automotive reel",
+      "kindRu": "Автомобильный ролик",
       "order": 1,
-      "poster": "/media/poster-1.jpg",
-      "src": "/media/sintel-trailer.mp4",
-      "previewStart": 12,
-      "duration": "00:52",
-      "demo": true
+      "poster": "/media/instagram-statement.jpg",
+      "url": "https://www.instagram.com/smolin.fx/reel/Dc0juwNNyIo/",
+      "duration": "REEL",
+      "demo": false
     },
     {
-      "id": "sintel-02",
-      "title": "Sintel — An encounter",
-      "client": "Blender Foundation",
-      "kind": "Open movie · Демо",
+      "id": "e39-boat",
+      "title": "Da Boat",
+      "titleRu": "У причала",
+      "client": "BMW E39 · @nturok",
+      "kind": "Car portrait",
+      "kindRu": "Автомобильный портрет",
       "order": 2,
-      "poster": "/media/poster-2.jpg",
-      "src": "/media/sintel-trailer.mp4",
-      "previewStart": 16,
-      "duration": "00:52",
-      "demo": true
+      "poster": "/media/instagram-e39.jpg",
+      "url": "https://www.instagram.com/smolin.fx/reel/DcNrwVRN-ma/",
+      "duration": "REEL",
+      "demo": false
     },
     {
-      "id": "sintel-03",
-      "title": "Sintel — Into the wild",
-      "client": "Blender Foundation",
-      "kind": "Open movie · Демо",
+      "id": "rtr-america",
+      "title": "America RAHHH",
+      "titleRu": "Америка RAHHH",
+      "client": "RTR Vehicles",
+      "kind": "Drift Masters · Mustang",
+      "kindRu": "Drift Masters · Mustang",
       "order": 3,
-      "poster": "/media/poster-3.jpg",
-      "src": "/media/sintel-trailer.mp4",
-      "previewStart": 24,
-      "duration": "00:52",
-      "demo": true
+      "poster": "/media/instagram-rtr.jpg",
+      "url": "https://www.instagram.com/smolin.fx/reel/DcGEJEDthBQ/",
+      "duration": "REEL",
+      "demo": false
     },
     {
-      "id": "sintel-04",
-      "title": "Sintel — In the shadows",
-      "client": "Blender Foundation",
-      "kind": "Open movie · Демо",
+      "id": "sonne-ferropolis",
+      "title": "Sonne",
+      "titleRu": "Солнце",
+      "client": "Juha Rintanen",
+      "kind": "Drift Masters · Ferropolis",
+      "kindRu": "Drift Masters · Феррополис",
       "order": 4,
-      "poster": "/media/poster-4.jpg",
-      "src": "/media/sintel-trailer.mp4",
-      "previewStart": 26,
-      "duration": "00:52",
-      "demo": true
+      "poster": "/media/instagram-sonne.jpg",
+      "url": "https://www.instagram.com/smolin.fx/reel/DcDYMcltpcH/",
+      "duration": "REEL",
+      "demo": false
     },
     {
-      "id": "sintel-05",
-      "title": "Sintel — A moment",
-      "client": "Blender Foundation",
-      "kind": "Open movie · Демо",
+      "id": "drift-factory",
+      "title": "Inside Drift Factory",
+      "titleRu": "Внутри Drift Factory",
+      "client": "Drift Factory",
+      "kind": "Drift culture",
+      "kindRu": "Дрифт-культура",
       "order": 5,
-      "poster": "/media/poster-5.jpg",
-      "src": "/media/sintel-trailer.mp4",
-      "previewStart": 28,
-      "duration": "00:52",
-      "demo": true
+      "poster": "/media/instagram-drift-factory.jpg",
+      "url": "https://www.instagram.com/smolin.fx/reel/Db2undAsxmj/",
+      "duration": "REEL",
+      "demo": false
     },
     {
-      "id": "sintel-06",
-      "title": "Sintel — The pursuit",
-      "client": "Blender Foundation",
-      "kind": "Open movie · Демо",
+      "id": "gt4rs-ssr",
+      "title": "Porsche GT4 RS · SSR CS",
+      "titleRu": "Porsche GT4 RS · SSR CS",
+      "client": "Ghost Performance · Statement.ee",
+      "kind": "Performance film",
+      "kindRu": "Имиджевый ролик",
       "order": 6,
-      "poster": "/media/poster-6.jpg",
-      "src": "/media/sintel-trailer.mp4",
-      "previewStart": 30,
-      "duration": "00:52",
-      "demo": true
+      "poster": "/media/instagram-gt4rs.jpg",
+      "url": "https://www.instagram.com/smolin.fx/reel/DbxS_WZtOcn/",
+      "duration": "REEL",
+      "demo": false
     }
   ],
   "logos": [
     {
-      "name": "STUDIO 01",
+      "name": "STATEMENT.EE",
       "image": "",
       "url": "",
       "order": 1
     },
     {
-      "name": "FORM / FILM",
+      "name": "DRIFT MASTERS",
       "image": "",
       "url": "",
       "order": 2
     },
     {
-      "name": "(YOUR BRAND)",
+      "name": "RTR VEHICLES",
       "image": "",
       "url": "",
       "order": 3
     },
     {
-      "name": "MONO STUDIO",
+      "name": "FERATI",
       "image": "",
       "url": "",
       "order": 4
     },
     {
-      "name": "COMPANY 05",
+      "name": "STRÖM WHEELS",
       "image": "",
       "url": "",
       "order": 5

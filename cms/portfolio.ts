@@ -14,11 +14,18 @@ export default {
     },
     {
       name: 'description',
-      title: 'Короткое описание (две строки)',
+      title: 'Short description — English (two lines)',
       type: 'text',
       rows: 2,
     },
-    { name: 'roles', title: 'Направления работы', type: 'string' },
+    {
+      name: 'descriptionRu',
+      title: 'Короткое описание — русский (две строки)',
+      type: 'text',
+      rows: 2,
+    },
+    { name: 'roles', title: 'Services — English', type: 'string' },
+    { name: 'rolesRu', title: 'Направления — русский', type: 'string' },
     { name: 'email', title: 'Email', type: 'string' },
     { name: 'phone', title: 'Телефон', type: 'string' },
     {
@@ -44,13 +51,15 @@ export default {
           type: 'object',
           name: 'work',
           fields: [
-            { name: 'title', title: 'Название', type: 'string' },
+            { name: 'title', title: 'Title — English', type: 'string' },
+            { name: 'titleRu', title: 'Название — русский', type: 'string' },
             {
               name: 'client',
               title: 'Клиент / автор деморолика',
               type: 'string',
             },
-            { name: 'kind', title: 'Тип работы', type: 'string' },
+            { name: 'kind', title: 'Work type — English', type: 'string' },
+            { name: 'kindRu', title: 'Тип работы — русский', type: 'string' },
             {
               name: 'order',
               title: 'Порядок (меньше — раньше)',
@@ -66,6 +75,11 @@ export default {
             {
               name: 'src',
               title: 'Прямая ссылка MP4 или HLS (если не Mux)',
+              type: 'url',
+            },
+            {
+              name: 'url',
+              title: 'Внешняя ссылка на работу (например, Instagram Reel)',
               type: 'url',
             },
             {

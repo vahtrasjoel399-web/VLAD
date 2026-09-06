@@ -7,9 +7,9 @@ export default async function Home() {
   } catch {
     return (
       <main className="error-page">
-        <h1>Небольшая пауза.</h1>
-        <p>Не удалось загрузить коллекцию.</p>
-        <a href="/">Попробовать снова ↗</a>
+        <h1>A short pause.</h1>
+        <p>The collection could not be loaded.</p>
+        <a href="/">Try again ↗</a>
       </main>
     );
   }
