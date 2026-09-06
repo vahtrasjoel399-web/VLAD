@@ -1,0 +1,114 @@
+{
+  "name": "FRAME",
+  "demo": true,
+  "description": "Создаю образы.\nОставляю ощущения.",
+  "roles": "Режиссура · Съёмка · Монтаж",
+  "email": "",
+  "socials": [],
+  "works": [
+    {
+      "id": "sintel-01",
+      "title": "Sintel — The journey",
+      "client": "Blender Foundation",
+      "kind": "Open movie · Демо",
+      "order": 1,
+      "poster": "/media/poster-1.jpg",
+      "src": "/media/sintel-trailer.mp4",
+      "previewStart": 12,
+      "duration": "00:52",
+      "demo": true
+    },
+    {
+      "id": "sintel-02",
+      "title": "Sintel — An encounter",
+      "client": "Blender Foundation",
+      "kind": "Open movie · Демо",
+      "order": 2,
+      "poster": "/media/poster-2.jpg",
+      "src": "/media/sintel-trailer.mp4",
+      "previewStart": 16,
+      "duration": "00:52",
+      "demo": true
+    },
+    {
+      "id": "sintel-03",
+      "title": "Sintel — Into the wild",
+      "client": "Blender Foundation",
+      "kind": "Open movie · Демо",
+      "order": 3,
+      "poster": "/media/poster-3.jpg",
+      "src": "/media/sintel-trailer.mp4",
+      "previewStart": 24,
+      "duration": "00:52",
+      "demo": true
+    },
+    {
+      "id": "sintel-04",
+      "title": "Sintel — In the shadows",
+      "client": "Blender Foundation",
+      "kind": "Open movie · Демо",
+      "order": 4,
+      "poster": "/media/poster-4.jpg",
+      "src": "/media/sintel-trailer.mp4",
+      "previewStart": 26,
+      "duration": "00:52",
+      "demo": true
+    },
+    {
+      "id": "sintel-05",
+      "title": "Sintel — A moment",
+      "client": "Blender Foundation",
+      "kind": "Open movie · Демо",
+      "order": 5,
+      "poster": "/media/poster-5.jpg",
+      "src": "/media/sintel-trailer.mp4",
+      "previewStart": 28,
+      "duration": "00:52",
+      "demo": true
+    },
+    {
+      "id": "sintel-06",
+      "title": "Sintel — The pursuit",
+      "client": "Blender Foundation",
+      "kind": "Open movie · Демо",
+      "order": 6,
+      "poster": "/media/poster-6.jpg",
+      "src": "/media/sintel-trailer.mp4",
+      "previewStart": 30,
+      "duration": "00:52",
+      "demo": true
+    }
+  ],
+  "logos": [
+    {
+      "name": "STUDIO 01",
+      "image": "",
+      "url": "",
+      "order": 1
+    },
+    {
+      "name": "FORM / FILM",
+      "image": "",
+      "url": "",
+      "order": 2
+    },
+    {
+      "name": "(YOUR BRAND)",
+      "image": "",
+      "url": "",
+      "order": 3
+    },
+    {
+      "name": "MONO STUDIO",
+      "image": "",
+      "url": "",
+      "order": 4
+    },
+    {
+      "name": "COMPANY 05",
+      "image": "",
+      "url": "",
+      "order": 5
+    }
+  ]
+}
