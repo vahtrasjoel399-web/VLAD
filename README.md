@@ -28,7 +28,7 @@
 1. Создайте аккаунты Mux и Sanity. Для публичного портфолио достаточно Public playback и public dataset. Не храните в публичном dataset приватные сведения.
 2. Создайте Sanity Studio через официальный quickstart: https://www.sanity.io/docs/studio/installation . Скопируйте `cms/portfolio.ts` в `schemaTypes/portfolio.ts`; импортируйте его и добавьте в массив schemaTypes в `schemaTypes/index.ts`. Разместите Studio через Sanity (его публикация и учётная запись отделены от сайта).
 3. Создайте один документ «Портфолио», заполните обязательные для показа материалы, опубликуйте. Не оставляйте пустые названия, повторяющиеся порядки и работу без Playback ID/ссылки. `_key` элементов Sanity используется как стабильный id.
-4. Добавьте серверные переменные `SANITY_PROJECT_ID` и `SANITY_DATASET=production` в окружение опубликованного Sites-проекта; локально — в `.env` (не коммитится). Понадобится однократное применение окружения/публикация сайта.
+4. Добавьте серверные переменные `SANITY_PROJECT_ID` и `SANITY_DATASET=production` в Vercel → Project Settings → Environment Variables; локально — в `.env` (не коммитится). Затем выполните один новый деплой.
 5. После этого все последующие изменения контента публикуются из Studio. CMS-запрос идёт с сервера, поэтому браузерный CORS для сайта не нужен. Токены записи в браузере отсутствуют; редакторов и вход в Studio контролирует Sanity.
 
 Если нужны private/signed видео, эту конфигурацию надо расширить серверной выдачей подписей. В текущей реализации используются публичные портфолио-работы.
@@ -39,7 +39,11 @@
 
 ## Разработка
 
-`npm install`, `npm run dev`, `npm run build`. Среда Vinext / React / Cloudflare Workers. Один CSS motion vocabulary, без перехвата скролла и WebGL. Нативный HTML video сохраняет системное управление и клавиатуру.
+`npm install`, `npm run dev`, `npm run build`. Среда Next.js / React, подготовленная для Vercel. Один CSS motion vocabulary, без перехвата скролла и WebGL. Нативный HTML video сохраняет системное управление и клавиатуру.
+
+## Публикация на Vercel
+
+Подключите репозиторий к Vercel и используйте корень репозитория. Framework Preset должен быть `Next.js`, Build Command — `npm run build`, Output Directory — без ручного значения. Файл `vercel.json` фиксирует Next.js как фреймворк. Production-сборка использует официальный Webpack-режим Next.js для предсказуемой совместимости. После изменения этих настроек нажмите Redeploy для последнего коммита.
 
 Сравнение видеопровайдеров и расчёты: `VIDEO-HOSTING.md`. Проверки и ограничения: `VALIDATION.md`.
 
