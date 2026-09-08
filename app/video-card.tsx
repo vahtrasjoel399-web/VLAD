@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import type Hls from 'hls.js';
-import { Play, ArrowUpRight } from 'lucide-react';
+import { Play, ArrowUpRight, Volume2, VolumeX } from 'lucide-react';
 import { posterSource, videoSource, type Work } from '@/lib/content';
 export default function VideoCard({
   work,
@@ -32,6 +32,7 @@ export default function VideoCard({
   const [error, setError] = useState('');
   const [blocked, setBlocked] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [muted, setMuted] = useState(true);
   const source = videoSource(work);
   const externalUrl = safeExternalLink(work.url);
   const title = locale === 'ru' ? work.titleRu || work.title : work.title;
@@ -129,12 +130,13 @@ export default function VideoCard({
           setLoading(false);
         });
     } else {
-      v.src = source;
+      if (v.getAttribute('src') !== source) v.src = source;
       play();
     }
     return () => {
       disposed = true;
-      v.pause();
+      // Preserve the click-initiated native playback when promoting a preview.
+      if (!mode.current.active || source.includes('.m3u8')) v.pause();
       hls.current?.destroy();
       hls.current = null;
     };
@@ -142,19 +144,33 @@ export default function VideoCard({
   const start = () => {
     onPreview(false);
     onActivate();
-    if (active) {
-      const v = video.current;
-      if (v) {
+    const v = video.current;
+    if (v) {
+      // Unlock audible playback inside the click, not a later React effect.
+      v.muted = false;
+      v.defaultMuted = false;
+      v.volume = 1;
+      setMuted(false);
+      if (!source.includes('.m3u8') || v.canPlayType('application/vnd.apple.mpegurl')) {
+        if (v.getAttribute('src') !== source) v.src = source;
         setError('');
         setBlocked(false);
         setLoading(true);
-        v.load();
-        v.play().catch(() => {
+        v.play().catch((reason: unknown) => {
+          if (reason instanceof DOMException && reason.name === 'AbortError') return;
           setBlocked(true);
           setLoading(false);
         });
       }
     }
+  };
+  const toggleSound = () => {
+    const v = video.current;
+    if (!v) return;
+    const enable = v.muted || v.volume === 0;
+    v.muted = !enable;
+    if (enable) v.volume = 1;
+    setMuted(!enable);
   };
   const onLoaded = () => {
     if (preview && video.current)
@@ -169,6 +185,9 @@ export default function VideoCard({
     setBlocked(false);
     setError('');
     setLoading(true);
+    v.muted = false;
+    v.defaultMuted = false;
+    if (v.volume === 0) v.volume = 1;
     if (v.error) {
       hls.current?.startLoad();
       v.load();
@@ -222,7 +241,10 @@ export default function VideoCard({
             preload="none"
             playsInline
             controls={active}
-            muted={!active}
+            onVolumeChange={(event) => {
+              const v = event.currentTarget;
+              setMuted(v.muted || v.volume === 0);
+            }}
             aria-label={title}
             onLoadedMetadata={onLoaded}
             onPlaying={() => {
@@ -260,7 +282,7 @@ export default function VideoCard({
             )}
           </video>
         )}
-        {!active && externalUrl ? (
+        {!active && !source && externalUrl ? (
           <a
             className="video-start"
             href={externalUrl}
@@ -279,6 +301,21 @@ export default function VideoCard({
             {overlay}
           </button>
         ) : null}
+        {active && (
+          <button
+            type="button"
+            className="video-sound"
+            onClick={toggleSound}
+            aria-label={locale === 'ru'
+              ? muted ? 'Включить звук' : 'Выключить звук'
+              : muted ? 'Unmute' : 'Mute'}
+          >
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            {locale === 'ru'
+              ? muted ? 'Включить звук' : 'Звук включён'
+              : muted ? 'Sound on' : 'Sound is on'}
+          </button>
+        )}
         {active && loading && !error && !blocked && (
           <div className="loading" role="status">
             {labels.loading}

@@ -28,8 +28,9 @@
       "order": 1,
       "poster": "/media/instagram-statement.jpg",
       "url": "https://www.instagram.com/smolin.fx/reel/Dc0juwNNyIo/",
-      "duration": "REEL",
-      "demo": false
+      "duration": "00:11",
+      "demo": false,
+      "src": "/media/statement-motion.mp4"
     },
     {
       "id": "e39-boat",
@@ -41,8 +42,9 @@
       "order": 2,
       "poster": "/media/instagram-e39.jpg",
       "url": "https://www.instagram.com/smolin.fx/reel/DcNrwVRN-ma/",
-      "duration": "REEL",
-      "demo": false
+      "duration": "00:19",
+      "demo": false,
+      "src": "/media/e39-boat.mp4"
     },
     {
       "id": "rtr-america",
@@ -54,8 +56,9 @@
       "order": 3,
       "poster": "/media/instagram-rtr.jpg",
       "url": "https://www.instagram.com/smolin.fx/reel/DcGEJEDthBQ/",
-      "duration": "REEL",
-      "demo": false
+      "duration": "00:13",
+      "demo": false,
+      "src": "/media/rtr-america.mp4"
     },
     {
       "id": "sonne-ferropolis",
@@ -67,8 +70,9 @@
       "order": 4,
       "poster": "/media/instagram-sonne.jpg",
       "url": "https://www.instagram.com/smolin.fx/reel/DcDYMcltpcH/",
-      "duration": "REEL",
-      "demo": false
+      "duration": "00:15",
+      "demo": false,
+      "src": "/media/sonne-ferropolis.mp4"
     },
     {
       "id": "drift-factory",
@@ -80,8 +84,9 @@
       "order": 5,
       "poster": "/media/instagram-drift-factory.jpg",
       "url": "https://www.instagram.com/smolin.fx/reel/Db2undAsxmj/",
-      "duration": "REEL",
-      "demo": false
+      "duration": "00:22",
+      "demo": false,
+      "src": "/media/drift-factory.mp4"
     },
     {
       "id": "gt4rs-ssr",
@@ -93,8 +98,9 @@
       "order": 6,
       "poster": "/media/instagram-gt4rs.jpg",
       "url": "https://www.instagram.com/smolin.fx/reel/DbxS_WZtOcn/",
-      "duration": "REEL",
-      "demo": false
+      "duration": "00:23",
+      "demo": false,
+      "src": "/media/gt4rs-ssr.mp4"
     }
   ],
   "logos": [
