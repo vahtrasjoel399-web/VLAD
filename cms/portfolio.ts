@@ -66,8 +66,19 @@ export default {
               type: 'number',
             },
             {
+              name: 'video',
+              title: 'Видео — загрузить файл',
+              type: 'mux.video',
+              description:
+                'Загрузите MP4, MOV или другой видеофайл. Mux сам подготовит качество и звук для браузеров.',
+              options: {
+                acceptedMimeTypes: ['video/*'],
+                max_resolution_tier: '2160p',
+              },
+            },
+            {
               name: 'muxPlaybackId',
-              title: 'Mux Public Playback ID',
+              title: 'Mux Playback ID — только для старых записей',
               type: 'string',
               description:
                 'Из Mux → Video → Asset → Playback IDs. Не Asset ID и не API token.',
@@ -120,15 +131,33 @@ export default {
     },
     {
       name: 'logos',
-      title: 'Компании',
+      title: 'Спонсоры',
       type: 'array',
       of: [
         {
           type: 'object',
           fields: [
-            { name: 'name', title: 'Название', type: 'string' },
-            { name: 'image', title: 'Логотип (PNG, WebP, SVG)', type: 'image' },
-            { name: 'url', title: 'Необязательная ссылка HTTPS', type: 'url' },
+            {
+              name: 'name',
+              title: 'Название спонсора',
+              type: 'string',
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              name: 'image',
+              title: 'Логотип PNG',
+              type: 'image',
+              description:
+                'Лучше PNG с прозрачным фоном. Цвет на сайте станет единым автоматически.',
+              options: { hotspot: false },
+              validation: (Rule: any) => Rule.required(),
+            },
+            {
+              name: 'url',
+              title: 'Сайт спонсора (HTTPS)',
+              type: 'url',
+              validation: (Rule: any) => Rule.required().uri({ scheme: ['https'] }),
+            },
             { name: 'order', title: 'Порядок', type: 'number' },
           ],
           preview: { select: { title: 'name', media: 'image' } },

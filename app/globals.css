@@ -610,8 +610,13 @@ h1:focus {
   width: 160px;
   height: 54px;
   object-fit: contain;
-  filter: grayscale(1);
+  filter: brightness(0) invert(0.68);
   opacity: 0.8;
+}
+.marquee-group > a:hover img,
+.marquee-group > a:focus-visible img {
+  filter: brightness(0) invert(1);
+  opacity: 1;
 }
 .marquee-group > :nth-child(2n) {
   font-family: Georgia, serif;

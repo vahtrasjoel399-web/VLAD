@@ -58,7 +58,7 @@ export async function getContent(): Promise<Portfolio> {
   if (!project) return demoContent;
   if (!/^[a-z0-9-]+$/.test(project) || !/^[a-z0-9_-]+$/.test(dataset))
     throw new Error('Invalid CMS configuration');
-  const query = `*[_type=="portfolio"][0]{name,demo,description,descriptionRu,roles,rolesRu,email,phone,socials,"works":works[]{"id":_key,title,titleRu,client,kind,kindRu,order,"poster":poster.asset->url,src,url,muxPlaybackId,previewStart,duration,demo,"captions":captions.asset->url},"logos":logos[]{name,"image":image.asset->url,url,order}}`;
+  const query = `*[_type=="portfolio"][0]{name,demo,description,descriptionRu,roles,rolesRu,email,phone,socials,"works":works[]{"id":_key,title,titleRu,client,kind,kindRu,order,"poster":poster.asset->url,src,url,"muxPlaybackId":coalesce(video.asset->playbackId,muxPlaybackId),previewStart,duration,demo,"captions":captions.asset->url},"logos":logos[]{name,"image":image.asset->url,url,order}}`;
   const response = await fetch(
     `https://${project}.api.sanity.io/v2025-02-19/data/query/${dataset}?perspective=published&query=${encodeURIComponent(query)}`,
     { cache: 'no-store', signal: AbortSignal.timeout(6000) },

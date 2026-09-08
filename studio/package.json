@@ -1,0 +1,16 @@
+{
+  "name": "smolin-fx-admin",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy"
+  },
+  "dependencies": {
+    "@sanity/vision": "6.13.0",
+    "sanity": "6.13.0",
+    "sanity-plugin-mux-input": "5.0.12",
+    "styled-components": "6.5.3"
+  }
+}
