@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { safeLink, type Portfolio } from '@/lib/content';
 import VideoCard from './video-card';
+import CursorGlow from './cursor-glow';
 type Page = 'works' | 'contacts';
 type Locale = 'en' | 'ru';
 
@@ -204,7 +205,7 @@ export default function PortfolioView({
             io.unobserve(entry.target);
           }
         }),
-      { threshold: 0.08 },
+      { threshold: 0.08, rootMargin: '0px 0px -6% 0px' },
     );
     document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
     return () => io.disconnect();
@@ -245,6 +246,13 @@ export default function PortfolioView({
     setCopyState('');
     localStorage.setItem('smolin-locale', next);
   };
+  const parallax = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== 'mouse' || paused || reduced) return;
+    const x = event.clientX / innerWidth - 0.5;
+    const y = event.clientY / innerHeight - 0.5;
+    event.currentTarget.style.setProperty('--px', `${(x * 36).toFixed(1)}px`);
+    event.currentTarget.style.setProperty('--py', `${(y * 28).toFixed(1)}px`);
+  };
   const toggleMotion = () => {
     const next = !paused;
     setPaused(next);
@@ -276,8 +284,10 @@ export default function PortfolioView({
   };
   return (
     <main
-      className={`${paused || reduced ? 'motion-paused' : ''} page-${page}`}
+      className={`${paused ? 'motion-paused' : ''} page-${page}`}
     >
+      <div className="scroll-progress" aria-hidden="true" />
+      <CursorGlow enabled={!paused && !reduced} />
       <a className="skip-link" href="#main-content">
         {t.skip}
       </a>
@@ -322,7 +332,12 @@ export default function PortfolioView({
           </div>
         </div>
       </header>
-      <div key={transition} className="page-content" id="main-content">
+      <div
+        key={transition}
+        className="page-content"
+        id="main-content"
+        onPointerMove={parallax}
+      >
         {page === 'works' ? (
           <>
             <section className="hero">
@@ -331,7 +346,7 @@ export default function PortfolioView({
                   <span>{t.heroLineOne}</span>
                 </span>
                 <span className="title-mask">
-                  <span className="outline">{t.heroLineTwo}</span>
+                  <span className="title-chrome">{t.heroLineTwo}</span>
                 </span>
               </h1>
               <img
@@ -438,7 +453,7 @@ export default function PortfolioView({
                   <span>{t.contactHeadingOne}</span>
                 </span>
                 <span className="title-mask">
-                  <span className="outline">{t.contactHeadingTwo}</span>
+                  <span className="title-chrome">{t.contactHeadingTwo}</span>
                 </span>
               </h1>
               <img
@@ -450,10 +465,13 @@ export default function PortfolioView({
               />
             </div>
             <div className="contact-details">
-              <p>{locale === 'ru' ? 'Напишите напрямую.' : 'Get in touch.'}</p>
+              <p className="reveal">{locale === 'ru' ? 'Напишите напрямую.' : 'Get in touch.'}</p>
               <div className="contact-links">
                 <div className="contact-methods">
-                  <div className="contact-method">
+                  <div
+                    className="contact-method reveal"
+                    style={{ '--delay': '0ms' } as React.CSSProperties}
+                  >
                     <span className="contact-icon" aria-hidden="true">
                       <img src="/media/contact-icons/instagram-chrome-transparent.png" alt="" width="96" height="96" />
                     </span>
@@ -467,7 +485,10 @@ export default function PortfolioView({
                       <span className="contact-unset">{t.notAdded}</span>
                     )}
                   </div>
-                  <div className="contact-method">
+                  <div
+                    className="contact-method reveal"
+                    style={{ '--delay': '90ms' } as React.CSSProperties}
+                  >
                     <span className="contact-icon" aria-hidden="true">
                       <img src="/media/contact-icons/youtube-chrome-transparent.png" alt="" width="96" height="96" />
                     </span>
@@ -481,7 +502,10 @@ export default function PortfolioView({
                       <span className="contact-unset">{t.notAdded}</span>
                     )}
                   </div>
-                  <div className="contact-method">
+                  <div
+                    className="contact-method reveal"
+                    style={{ '--delay': '180ms' } as React.CSSProperties}
+                  >
                     <span className="contact-icon" aria-hidden="true">
                       <img src="/media/contact-icons/phone-chrome-transparent.png" alt="" width="96" height="96" />
                     </span>
@@ -495,7 +519,10 @@ export default function PortfolioView({
                       <span className="contact-unset">{t.notAdded}</span>
                     )}
                   </div>
-                  <div className="contact-method">
+                  <div
+                    className="contact-method reveal"
+                    style={{ '--delay': '270ms' } as React.CSSProperties}
+                  >
                     <span className="contact-icon" aria-hidden="true">
                       <img src="/media/contact-icons/email-chrome-transparent.png" alt="" width="96" height="96" />
                     </span>
@@ -546,7 +573,7 @@ export default function PortfolioView({
               </div>
             </div>
             <a
-              className="back-link"
+              className="back-link reveal"
               href="/"
               onClick={(e) => navigate(e, 'works')}
             >

@@ -143,9 +143,23 @@ sup {
 .hero h1 span {
   display: block;
 }
-.outline {
-  color: transparent;
-  -webkit-text-stroke: 1px #aaa;
+.title-chrome {
+  color: #d9d9d9;
+  background: linear-gradient(
+    100deg,
+    #7a7a7a 0%,
+    #e9e9e9 14%,
+    #9c9c9c 28%,
+    #ffffff 42%,
+    #8d8d8d 56%,
+    #f2f2f2 72%,
+    #7a7a7a 86%,
+    #e9e9e9 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .chrome {
   position: absolute;
@@ -345,16 +359,33 @@ h1:focus {
 }
 .hero h1 > .title-mask {
   display: block;
-  overflow: visible;
+  /* Clip only below the line so the rising letters appear from a mask. */
+  clip-path: inset(-0.5em -0.5em -0.14em -0.5em);
 }
 .title-mask > span {
   display: block;
-  transform: none;
+  animation: title-reveal 1.15s var(--ease) both;
+  animation-delay: 0.15s;
+}
+.title-mask + .title-mask > span {
+  animation-delay: 0.3s;
+}
+.title-mask > .title-chrome {
+  animation:
+    title-reveal 1.15s var(--ease) 0.3s both,
+    chrome-sheen 7s ease-in-out 1.4s infinite;
 }
 .chrome {
   mask-image: radial-gradient(ellipse at center, #000 48%, transparent 72%);
-  animation: chrome-light 10s ease-in-out infinite;
+  animation:
+    chrome-in 1.6s var(--ease) 0.2s both,
+    chrome-light 10s ease-in-out 1.8s infinite;
   transform-origin: 55% 50%;
+  translate: var(--px, 0) var(--py, 0);
+  transition: translate 0.9s var(--ease);
+}
+.hero-bottom {
+  animation: fade-up 1s var(--ease) 0.6s both;
 }
 .hero-bottom p {
   white-space: pre-line;
@@ -371,7 +402,21 @@ h1:focus {
   transform: translateY(4px);
 }
 .page-content {
-  transform: none;
+  animation: page-in 0.7s var(--ease) both;
+}
+header {
+  animation: header-in 0.9s var(--ease) both;
+}
+.scroll-progress {
+  display: none;
+  position: fixed;
+  inset: 0 0 auto;
+  height: 2px;
+  z-index: 60;
+  background: linear-gradient(90deg, #777, #fff);
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
 }
 .frame {
   isolation: isolate;
@@ -652,8 +697,19 @@ h1:focus {
   height: 12vw;
   transition: transform 0.5s var(--ease);
 }
-.contact-teaser > a:hover > svg {
-  transform: translate(10px, -10px);
+.contact-teaser > a > span {
+  transition:
+    transform 0.6s var(--ease),
+    letter-spacing 0.6s var(--ease);
+}
+.contact-teaser > a:hover > span,
+.contact-teaser > a:focus-visible > span {
+  transform: translateX(1.2vw);
+  letter-spacing: -0.04em;
+}
+.contact-teaser > a:hover > svg,
+.contact-teaser > a:focus-visible > svg {
+  transform: translate(10px, -10px) rotate(45deg);
 }
 .teaser-bottom {
   display: flex;
@@ -703,7 +759,7 @@ footer {
 }
 .contact-heading .title-mask {
   display: block;
-  overflow: visible;
+  clip-path: inset(-0.5em -0.5em -0.14em -0.5em);
 }
 .contact-chrome {
   position: absolute;
@@ -713,7 +769,11 @@ footer {
   height: 125%;
   object-fit: contain;
   mask-image: radial-gradient(ellipse, #000 45%, transparent 71%);
-  animation: chrome-light 10s ease-in-out infinite;
+  animation:
+    chrome-in 1.6s var(--ease) 0.2s both,
+    chrome-light 10s ease-in-out 1.8s infinite;
+  translate: var(--px, 0) var(--py, 0);
+  transition: translate 0.9s var(--ease);
 }
 .contact-details {
   display: grid;
@@ -860,19 +920,50 @@ footer {
 }
 .reveal {
   transition:
-    clip-path 0.85s var(--ease),
-    transform 0.85s var(--ease);
+    opacity 0.9s var(--ease),
+    transform 0.9s var(--ease);
   transition-delay: var(--delay, 0ms);
 }
-@media (prefers-reduced-motion: no-preference) {
-  .reveal:not(.revealed) {
-    clip-path: none;
+.work .frame {
+  clip-path: inset(0);
+  transition: clip-path 1.1s var(--ease) var(--delay, 0ms);
+}
+.work .caption,
+.work .subcaption {
+  transition:
+    opacity 0.8s var(--ease),
+    transform 0.8s var(--ease);
+  transition-delay: calc(var(--delay, 0ms) + 0.25s);
+}
+/* Hidden states only apply when scripts can reveal them again. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  main:not(.motion-paused) .reveal:not(.revealed) {
+    opacity: 0;
+    transform: translateY(44px);
+  }
+  main:not(.motion-paused) .work.reveal:not(.revealed) {
+    opacity: 1;
     transform: none;
   }
+  main:not(.motion-paused) .work.reveal:not(.revealed) .frame {
+    clip-path: inset(100% 0 0 0);
+  }
+  main:not(.motion-paused) .work.reveal:not(.revealed) .poster {
+    transform: scale(1.18);
+  }
+  main:not(.motion-paused) .work.reveal:not(.revealed) .caption,
+  main:not(.motion-paused) .work.reveal:not(.revealed) .subcaption {
+    opacity: 0;
+    transform: translateY(14px);
+  }
 }
-.reveal.revealed {
-  clip-path: inset(-10px);
-  transform: none;
+.work.revealed .poster {
+  transition:
+    transform 1.4s var(--ease),
+    opacity 0.45s var(--ease);
+}
+.work.revealed .frame:hover:not(.is-active) .poster {
+  transition-duration: 0.8s, 0.45s;
 }
 .error-page {
   min-height: 100vh;
@@ -897,16 +988,95 @@ footer {
   clip-path: none;
 }
 .motion-paused .reveal {
-  clip-path: none !important;
-  transform: none !important;
   transition: none !important;
+}
+.motion-paused .chrome,
+.motion-paused .contact-chrome {
+  translate: none;
+}
+.motion-paused .hero h1,
+.motion-paused .scroll-progress,
+.motion-paused .hero-bottom,
+.motion-paused header {
+  animation: none !important;
+}
+.motion-paused .scroll-progress {
+  display: none !important;
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-progress {
+      display: block;
+      animation: scroll-progress linear both;
+      animation-timeline: scroll(root);
+    }
+    .hero h1 {
+      animation: hero-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 85vh;
+    }
+  }
 }
 @keyframes title-reveal {
   from {
-    transform: translateY(115%) rotate(3deg);
+    transform: translateY(125%) rotate(4deg);
+    transform-origin: 0 100%;
   }
   to {
     transform: translateY(0) rotate(0);
+    transform-origin: 0 100%;
+  }
+}
+@keyframes chrome-sheen {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes chrome-in {
+  from {
+    opacity: 0;
+    scale: 0.82;
+    filter: blur(14px) brightness(0.6);
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    filter: blur(0) brightness(0.9);
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes header-in {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes scroll-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes hero-drift {
+  to {
+    transform: translateY(22%);
+    opacity: 0.18;
   }
 }
 @keyframes chrome-light {
@@ -927,9 +1097,11 @@ footer {
 }
 @keyframes page-in {
   from {
+    opacity: 0;
     transform: translateY(18px);
   }
   to {
+    opacity: 1;
     transform: none;
   }
 }
@@ -1192,9 +1364,13 @@ footer {
     transition: none !important;
     scroll-behavior: auto !important;
   }
-  .reveal {
+  .reveal,
+  .reveal * {
     clip-path: none !important;
-    transform: none !important;
+  }
+  .chrome,
+  .contact-chrome {
+    translate: none !important;
   }
 }
 
@@ -1210,4 +1386,45 @@ footer {
   .hero {
     padding-bottom: 25px;
   }
+}
+.cursor-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+}
+.cursor-glow-halo,
+.cursor-glow-core {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  will-change: transform;
+}
+.cursor-glow-halo {
+  width: 560px;
+  height: 560px;
+  margin: -280px 0 0 -280px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.035) 35%,
+    transparent 68%
+  );
+}
+.cursor-glow-core {
+  width: 140px;
+  height: 140px;
+  margin: -70px 0 0 -70px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.07) 40%,
+    transparent 70%
+  );
+  filter: blur(6px);
 }

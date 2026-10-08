@@ -87,6 +87,9 @@ export default {
               name: 'src',
               title: 'Прямая ссылка MP4 или HLS (если не Mux)',
               type: 'url',
+              description: 'Можно путь к файлу сайта, например /media/clip.mp4',
+              validation: (Rule: any) =>
+                Rule.uri({ allowRelative: true, scheme: ['https', 'http'] }),
             },
             {
               name: 'url',
@@ -148,15 +151,15 @@ export default {
               title: 'Логотип PNG',
               type: 'image',
               description:
-                'Лучше PNG с прозрачным фоном. Цвет на сайте станет единым автоматически.',
+                'Лучше PNG с прозрачным фоном. Цвет на сайте станет единым автоматически. Без картинки в строке покажется название.',
               options: { hotspot: false },
-              validation: (Rule: any) => Rule.required(),
             },
             {
               name: 'url',
               title: 'Сайт спонсора (HTTPS)',
               type: 'url',
-              validation: (Rule: any) => Rule.required().uri({ scheme: ['https'] }),
+              description: 'Необязательно. С ссылкой логотип станет кликабельным.',
+              validation: (Rule: any) => Rule.uri({ scheme: ['https'] }),
             },
             { name: 'order', title: 'Порядок', type: 'number' },
           ],
