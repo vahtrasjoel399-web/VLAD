@@ -1395,15 +1395,18 @@ footer {
   overflow: hidden;
   mix-blend-mode: screen;
 }
-.cursor-glow-halo,
-.cursor-glow-core {
+.cursor-glow-light {
   position: absolute;
   left: 0;
   top: 0;
-  border-radius: 50%;
   opacity: 0;
-  transition: opacity 0.6s ease;
+  transition: opacity 0.4s ease;
   will-change: transform;
+}
+.cursor-glow-halo,
+.cursor-glow-core {
+  position: absolute;
+  border-radius: 50%;
 }
 .cursor-glow-halo {
   width: 560px;
