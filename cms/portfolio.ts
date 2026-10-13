@@ -167,5 +167,71 @@ export default {
         },
       ],
     },
+    {
+      name: 'products',
+      title: 'Магазин — товары',
+      description:
+        'Пресеты, LUT и другие цифровые товары. Раздел Store появится на сайте после публикации первого товара.',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          name: 'product',
+          fields: [
+            {
+              name: 'title',
+              title: 'Title — English',
+              type: 'string',
+              validation: (Rule: any) => Rule.required(),
+            },
+            { name: 'titleRu', title: 'Название — русский', type: 'string' },
+            {
+              name: 'category',
+              title: 'Категория, например Presets или LUTs',
+              type: 'string',
+            },
+            {
+              name: 'description',
+              title: 'Short description — English',
+              type: 'text',
+              rows: 2,
+            },
+            {
+              name: 'descriptionRu',
+              title: 'Короткое описание — русский',
+              type: 'text',
+              rows: 2,
+            },
+            {
+              name: 'price',
+              title: 'Цена, EUR',
+              type: 'number',
+              description: '0 — бесплатный товар.',
+              validation: (Rule: any) => Rule.min(0),
+            },
+            {
+              name: 'image',
+              title: 'Картинка PNG',
+              type: 'image',
+              description:
+                'PNG с прозрачным фоном. На сайте показывается целиком, без рамки и обрезки. Без картинки останется пустое место.',
+              options: { hotspot: false, accept: 'image/png,image/webp' },
+            },
+            {
+              name: 'checkoutUrl',
+              title: 'Ссылка на оплату (HTTPS)',
+              type: 'url',
+              description:
+                'Ссылка на покупку из сервиса продаж. Сам файл товара загружайте в сервис продаж, не сюда. Без ссылки вместо кнопки будет «Скоро».',
+              validation: (Rule: any) => Rule.uri({ scheme: ['https'] }),
+            },
+            { name: 'order', title: 'Порядок (меньше — раньше)', type: 'number' },
+          ],
+          preview: {
+            select: { title: 'title', subtitle: 'category', media: 'image' },
+          },
+        },
+      ],
+    },
   ],
 };

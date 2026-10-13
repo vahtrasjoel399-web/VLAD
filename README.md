@@ -10,6 +10,7 @@
 
 - Работа: `id` (уникальный), `title`/`titleRu`, `client`, `kind`/`kindRu`, `order`, `poster`, `muxPlaybackId` **или** `src` (MP4/HLS), либо внешняя `url` (например Instagram Reel), `previewStart`, `duration`, `demo`, необязательно `captions` (WebVTT).
 - Спонсор: `name`, `image`, `url` (HTTPS), `order`. PNG лучше загружать с прозрачным фоном.
+- Товар магазина (`products`): `title`/`titleRu`, `category`, `description`/`descriptionRu`, `price` в EUR (0 — бесплатно), `image` (PNG с прозрачным фоном, показывается целиком без рамки), `checkoutUrl` (HTTPS-ссылка на оплату в сервисе продаж), `order`. Страница `/store` и пункт меню появляются, когда есть хотя бы один товар. Файлы товаров хранятся в сервисе продаж, не в Sanity: dataset публичный.
 - Контакты: `email`, `phone`, `socials: [{name, url}]`. Instagram определяется по названию или адресу `instagram.com`; `name` верхнего уровня — имя или авторский логотип. Английский интерфейс открывается первым, выбор русского сохраняется в браузере.
 
 Изменение JSON требует повторной публикации сайта. Для обновления через кнопку Publish без изменения кода предусмотрено подключение Sanity ниже.

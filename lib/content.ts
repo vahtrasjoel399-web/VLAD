@@ -22,6 +22,18 @@ export type Logo = {
   url?: string;
   order: number;
 };
+export type Product = {
+  id: string;
+  title: string;
+  titleRu?: string;
+  category?: string;
+  description?: string;
+  descriptionRu?: string;
+  price?: number;
+  image?: string;
+  checkoutUrl?: string;
+  order: number;
+};
 export type Portfolio = {
   name: string;
   demo: boolean;
@@ -34,6 +46,7 @@ export type Portfolio = {
   socials: { name: string; url: string }[];
   works: Work[];
   logos: Logo[];
+  products: Product[];
 };
 export const demoContent: Portfolio = fallback;
 export function safeLink(value: string | undefined) {
@@ -52,13 +65,19 @@ export function posterSource(work: Work) {
       : '')
   );
 }
+export function productImage(product: Product) {
+  const src = product.image || '';
+  return src.startsWith('https://cdn.sanity.io/')
+    ? `${src}?w=1200&fit=max&auto=format`
+    : src;
+}
 export async function getContent(): Promise<Portfolio> {
   const project = process.env.SANITY_PROJECT_ID;
   const dataset = process.env.SANITY_DATASET || 'production';
   if (!project) return demoContent;
   if (!/^[a-z0-9-]+$/.test(project) || !/^[a-z0-9_-]+$/.test(dataset))
     throw new Error('Invalid CMS configuration');
-  const query = `*[_type=="portfolio"][0]{name,demo,description,descriptionRu,roles,rolesRu,email,phone,socials,"works":works[]{"id":_key,title,titleRu,client,kind,kindRu,order,"poster":poster.asset->url,src,url,"muxPlaybackId":coalesce(video.asset->playbackId,muxPlaybackId),previewStart,duration,demo,"captions":captions.asset->url},"logos":logos[]{name,"image":image.asset->url,url,order}}`;
+  const query = `*[_type=="portfolio"][0]{name,demo,description,descriptionRu,roles,rolesRu,email,phone,socials,"works":works[]{"id":_key,title,titleRu,client,kind,kindRu,order,"poster":poster.asset->url,src,url,"muxPlaybackId":coalesce(video.asset->playbackId,muxPlaybackId),previewStart,duration,demo,"captions":captions.asset->url},"logos":logos[]{name,"image":image.asset->url,url,order},"products":products[]{"id":_key,title,titleRu,category,description,descriptionRu,price,"image":image.asset->url,checkoutUrl,order}}`;
   const response = await fetch(
     `https://${project}.api.sanity.io/v2025-02-19/data/query/${dataset}?perspective=published&query=${encodeURIComponent(query)}`,
     { cache: 'no-store', signal: AbortSignal.timeout(6000) },
@@ -79,5 +98,6 @@ export async function getContent(): Promise<Portfolio> {
     socials: result.socials || [],
     description: result.description || '',
     roles: result.roles || '',
+    products: result.products || [],
   };
 }

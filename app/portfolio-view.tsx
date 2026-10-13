@@ -12,7 +12,13 @@ import {
 import { safeLink, type Portfolio } from '@/lib/content';
 import VideoCard from './video-card';
 import CursorGlow from './cursor-glow';
-type Page = 'works' | 'contacts';
+import StoreView from './store-view';
+type Page = 'works' | 'store' | 'contacts';
+const PATHS: Record<Page, string> = {
+  works: '/',
+  store: '/store',
+  contacts: '/contacts',
+};
 type Locale = 'en' | 'ru';
 
 const COPY = {
@@ -20,6 +26,7 @@ const COPY = {
     skip: 'Skip to content',
     navLabel: 'Main navigation',
     works: 'Work',
+    store: 'Store',
     contacts: 'Contact',
     language: 'Language',
     heroPrimary: 'INDEPENDENT VIDEO CREATOR',
@@ -73,6 +80,7 @@ const COPY = {
     skip: 'К содержимому',
     navLabel: 'Основная навигация',
     works: 'Работы',
+    store: 'Магазин',
     contacts: 'Контакты',
     language: 'Язык',
     heroPrimary: 'НЕЗАВИСИМЫЙ ВИДЕОКРЕАТОР',
@@ -144,6 +152,7 @@ export default function PortfolioView({
   const t = COPY[locale];
   const works = [...content.works].sort((a, b) => a.order - b.order);
   const logos = [...content.logos].sort((a, b) => a.order - b.order);
+  const products = [...content.products].sort((a, b) => a.order - b.order);
   const instagram = content.socials.find(
     (social) =>
       social.name.toLowerCase().includes('instagram') ||
@@ -175,7 +184,13 @@ export default function PortfolioView({
       ),
     );
     const pop = () => {
-      setPage(location.pathname === '/contacts' ? 'contacts' : 'works');
+      setPage(
+        location.pathname === '/contacts'
+          ? 'contacts'
+          : location.pathname === '/store'
+            ? 'store'
+            : 'works',
+      );
       setActive(null);
       setPreview(null);
     };
@@ -228,7 +243,7 @@ export default function PortfolioView({
     setPreview(null);
     setPage(next);
     setTransition((x) => x + 1);
-    history.pushState({}, '', next === 'contacts' ? '/contacts' : '/');
+    history.pushState({}, '', PATHS[next]);
     window.scrollTo({ top: 0, behavior: 'instant' });
     requestAnimationFrame(() => title.current?.focus({ preventScroll: true }));
   };
@@ -284,7 +299,7 @@ export default function PortfolioView({
   };
   return (
     <main
-      className={`${paused ? 'motion-paused' : ''} page-${page}`}
+      className={`${paused ? 'motion-paused' : ''} page-${page} ${products.length > 0 ? 'has-store' : ''}`}
     >
       <div className="scroll-progress" aria-hidden="true" />
       <CursorGlow enabled={!paused && !reduced} />
@@ -305,6 +320,15 @@ export default function PortfolioView({
             >
               {t.works} <sup>{String(works.length).padStart(2, '0')}</sup>
             </a>
+            {products.length > 0 && (
+              <a
+                href="/store"
+                aria-current={page === 'store' ? 'page' : undefined}
+                onClick={(e) => navigate(e, 'store')}
+              >
+                {t.store}
+              </a>
+            )}
             <a
               href="/contacts"
               aria-current={page === 'contacts' ? 'page' : undefined}
@@ -445,6 +469,14 @@ export default function PortfolioView({
               </a>
             </section>
           </>
+        ) : page === 'store' ? (
+          <StoreView
+            products={products}
+            locale={locale}
+            titleRef={title}
+            onBack={(e) => navigate(e, 'works')}
+            onContact={(e) => navigate(e, 'contacts')}
+          />
         ) : (
           <section className="contacts">
             <div className="contact-heading">
