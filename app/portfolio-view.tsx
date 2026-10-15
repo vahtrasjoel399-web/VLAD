@@ -299,7 +299,7 @@ export default function PortfolioView({
   };
   return (
     <main
-      className={`${paused ? 'motion-paused' : ''} page-${page} ${products.length > 0 ? 'has-store' : ''}`}
+      className={`${paused ? 'motion-paused' : ''} page-${page}`}
     >
       <div className="scroll-progress" aria-hidden="true" />
       <CursorGlow enabled={!paused && !reduced} />
@@ -320,15 +320,13 @@ export default function PortfolioView({
             >
               {t.works} <sup>{String(works.length).padStart(2, '0')}</sup>
             </a>
-            {products.length > 0 && (
-              <a
-                href="/store"
-                aria-current={page === 'store' ? 'page' : undefined}
-                onClick={(e) => navigate(e, 'store')}
-              >
-                {t.store}
-              </a>
-            )}
+            <a
+              href="/store"
+              aria-current={page === 'store' ? 'page' : undefined}
+              onClick={(e) => navigate(e, 'store')}
+            >
+              {t.store}
+            </a>
             <a
               href="/contacts"
               aria-current={page === 'contacts' ? 'page' : undefined}

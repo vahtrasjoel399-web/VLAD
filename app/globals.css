@@ -2018,23 +2018,23 @@ a.product-buy:focus-visible::before {
 }
 /* Three nav items: keep the header on one line on phones. */
 @media (max-width: 420px) {
-  .has-store nav a svg {
+  nav a svg {
     display: none;
   }
 }
 @media (max-width: 340px) {
-  .has-store .wordmark {
+  .wordmark {
     max-width: 92px;
     font-size: 16px;
   }
-  .has-store .wordmark span {
+  .wordmark span {
     display: none;
   }
-  .has-store nav {
+  nav {
     gap: 7px;
     font-size: 10px;
   }
-  .has-store .header-actions {
+  .header-actions {
     gap: 7px;
   }
 }
