@@ -1477,8 +1477,7 @@ footer {
   left: 12px;
 }
 /* Halftone glow behind the product: round and soft, never a box. */
-.product-halftone,
-.store-dots {
+.product-halftone {
   background-image: radial-gradient(circle, #fff 0 1.1px, transparent 1.7px);
   background-size: 7px 7px;
   mask-image: radial-gradient(circle closest-side, #000 18%, transparent);
@@ -1622,40 +1621,24 @@ a.product-buy:focus-visible::before {
   animation: chrome-in 1.6s var(--ease) 0.2s both;
   pointer-events: none;
 }
-.store-ring {
+/* Rendered in Blender (art/chrome-flower.py); a plain image keeps it cheap to animate. */
+.store-glow {
   position: absolute;
-  inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: 50%;
+  inset: -10% 0 10%;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(255, 255, 255, 0.13),
+    rgba(255, 255, 255, 0.03) 55%,
+    transparent
+  );
 }
-.store-ring + .store-ring {
-  inset: 18% -8% 18% 44%;
-  border-color: rgba(255, 255, 255, 0.08);
-}
-.store-dots {
+.store-flower {
   position: absolute;
-  inset: 6%;
-  opacity: 0.2;
-}
-.store-spark {
-  position: absolute;
-  top: 16%;
-  left: 24%;
-  width: 46%;
-  height: 46%;
-  filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.22));
-}
-.store-spark + .store-spark {
-  top: 8%;
-  left: 68%;
-  width: 20%;
-  height: 20%;
-}
-.store-spark + .store-spark + .store-spark {
-  top: 62%;
-  left: 62%;
-  width: 13%;
-  height: 13%;
+  top: -10%;
+  left: 10%;
+  width: 80%;
+  height: auto;
+  transform-origin: 62% 100%;
 }
 .checker {
   display: inline-block;
@@ -1674,25 +1657,6 @@ a.product-buy:focus-visible::before {
   color: #777;
   font: 10px monospace;
   letter-spacing: 1px;
-}
-/* Dashed orbit with a small satellite riding on it. */
-.store-orbit {
-  position: absolute;
-  inset: -3%;
-  border: 1px dashed rgba(255, 255, 255, 0.16);
-  border-radius: 50%;
-}
-.store-orbit::after {
-  content: '';
-  position: absolute;
-  top: -4px;
-  left: 50%;
-  width: 7px;
-  height: 7px;
-  margin-left: -4px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 14px 2px rgba(255, 255, 255, 0.6);
 }
 .store-ticker {
   overflow: hidden;
@@ -1858,21 +1822,30 @@ a.product-buy:focus-visible::before {
   padding: 34px 38px;
   border: 1px solid #383838;
 }
-.store-liquid {
+.liquid {
   position: absolute;
   inset: 0;
   z-index: -1;
+  overflow: hidden;
   opacity: 0.6;
-  mask-image: linear-gradient(100deg, transparent 4%, #000 58%);
+  background: radial-gradient(ellipse at 80% 40%, #1c1c1c, transparent 70%);
   transition: opacity 0.8s var(--ease);
 }
-.store-liquid svg {
-  width: 100%;
-  height: 100%;
+/* Each canvas pixel is one 6px cell; the mask turns cells into halftone dots. */
+.liquid-canvas {
+  display: block;
+  image-rendering: pixelated;
   mask-image: radial-gradient(circle, #000 0 1.7px, transparent 2.3px);
   mask-size: 6px 6px;
 }
-.store-liquid::after {
+/* Same liquid behind the home heading: full bleed, quieter, faded top and bottom. */
+.hero-liquid {
+  inset: 0 calc(50% - 50vw);
+  opacity: 0.38;
+  background: none;
+  mask-image: linear-gradient(transparent, #000 14%, #000 70%, transparent);
+}
+.liquid::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -1882,8 +1855,8 @@ a.product-buy:focus-visible::before {
     transparent 1px 5px
   );
 }
-.store-cta:hover .store-liquid,
-.store-cta:focus-visible .store-liquid {
+.store-cta:hover .liquid,
+.store-cta:focus-visible .liquid {
   opacity: 0.95;
 }
 .store-cta strong {
@@ -1915,31 +1888,61 @@ a.product-buy:focus-visible::before {
   translate: none;
   animation: none;
 }
+.product-hover-image {
+  position: absolute !important;
+  inset: 5%;
+  width: 90% !important;
+  height: 90% !important;
+  opacity: 0;
+  transition:
+    opacity 0.6s var(--ease),
+    transform 0.8s var(--ease) !important;
+}
+.product-art.has-hover > img:not(.product-hover-image) {
+  transition:
+    opacity 0.6s var(--ease),
+    transform 0.8s var(--ease);
+}
+.product:hover .product-art.has-hover > img:not(.product-hover-image) {
+  opacity: 0;
+}
+.product:hover .product-hover-image {
+  opacity: 1;
+}
+.product-new {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 8px;
+  background: #eee;
+  color: #090909;
+  font: 700 10px monospace;
+  letter-spacing: 1px;
+}
+.product-art.is-empty .product-new {
+  top: 12px;
+  right: 12px;
+}
+@keyframes flower-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
 @keyframes store-spin {
   to {
     transform: rotate(360deg);
-  }
-}
-@keyframes spark-twinkle {
-  0%,
-  100% {
-    transform: scale(1) rotate(0);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(0.82) rotate(14deg);
-    opacity: 0.7;
   }
 }
 @media (prefers-reduced-motion: no-preference) {
   main:not(.motion-paused) .product:hover .product-art img {
     transform: translateY(-8px) scale(1.03);
   }
-  .store-spark {
-    animation: spark-twinkle 6s ease-in-out infinite;
-  }
-  .store-orbit {
-    animation: store-spin 46s linear infinite;
+  .store-flower {
+    animation: flower-sway 9s ease-in-out infinite;
   }
   .store-globe {
     animation: store-spin 90s linear infinite reverse;
@@ -1949,14 +1952,6 @@ a.product-buy:focus-visible::before {
   }
   .store-ticker-spark {
     animation: store-spin 9s linear infinite;
-  }
-  .store-spark + .store-spark {
-    animation-duration: 4.2s;
-    animation-delay: -1.5s;
-  }
-  .store-spark + .store-spark + .store-spark {
-    animation-duration: 3.4s;
-    animation-delay: -0.8s;
   }
 }
 @media (max-width: 950px) {
@@ -2005,6 +2000,11 @@ a.product-buy:focus-visible::before {
   .store-cta {
     padding: 24px 20px;
   }
+  .store-flower {
+    top: 2%;
+    left: 16%;
+    width: 76%;
+  }
   .store-deco {
     top: -34%;
     right: -4%;
@@ -2036,5 +2036,103 @@ a.product-buy:focus-visible::before {
   }
   .header-actions {
     gap: 7px;
+  }
+}
+/* Home intro: the hero pins while two chrome halves meet (app/intro-knot.tsx). */
+.intro-canvas,
+.intro-hint {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  main:not(.motion-paused) .intro:not(.intro-off) {
+    height: 230svh;
+  }
+  main:not(.motion-paused) .intro:not(.intro-off) .intro-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+  main:not(.motion-paused) .intro:not(.intro-off) .hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    padding-bottom: 40px;
+  }
+  main:not(.motion-paused) .intro:not(.intro-off) .intro-canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: calc(50% - 50vw);
+    z-index: 2;
+    width: 100vw;
+    height: 100%;
+    pointer-events: none;
+  }
+  main:not(.motion-paused) .intro:not(.intro-off) .chrome {
+    display: none;
+  }
+  main:not(.motion-paused) .intro:not(.intro-off) .hero h1 {
+    animation: none;
+  }
+  /* Title waits for the halves to join, then rises in. */
+  main:not(.motion-paused) .intro:not(.intro-off) .hero .title-mask > span {
+    animation: none;
+    transform: translateY(125%) rotate(4deg);
+    transform-origin: 0 100%;
+    transition: transform 1.1s var(--ease) 0.1s;
+  }
+  main:not(.motion-paused)
+    .intro:not(.intro-off)
+    .hero
+    .title-mask
+    + .title-mask
+    > span {
+    transition-delay: 0.25s;
+  }
+  main:not(.motion-paused) .intro:not(.intro-off) .hero .title-chrome {
+    animation: chrome-sheen 7s ease-in-out 1.4s infinite;
+  }
+  main:not(.motion-paused) .intro.is-joined .hero .title-mask > span {
+    transform: none;
+  }
+  main:not(.motion-paused) .intro:not(.intro-off) .hero-bottom {
+    animation: none;
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.9s var(--ease) 0.45s,
+      transform 0.9s var(--ease) 0.45s;
+  }
+  main:not(.motion-paused) .intro.is-joined .hero-bottom {
+    opacity: 1;
+    transform: none;
+  }
+  main:not(.motion-paused) .intro:not(.intro-off) .intro-hint {
+    display: flex;
+    position: absolute;
+    bottom: 34px;
+    left: 50%;
+    z-index: 3;
+    align-items: center;
+    gap: 8px;
+    translate: -50% 0;
+    color: #888;
+    font: 10px monospace;
+    letter-spacing: 3px;
+    transition: opacity 0.5s ease;
+    animation: intro-hint 2.4s ease-in-out infinite;
+  }
+  main:not(.motion-paused) .intro.is-joined .intro-hint {
+    opacity: 0;
+  }
+}
+@keyframes intro-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
   }
 }

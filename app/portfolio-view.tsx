@@ -13,6 +13,8 @@ import { safeLink, type Portfolio } from '@/lib/content';
 import VideoCard from './video-card';
 import CursorGlow from './cursor-glow';
 import StoreView from './store-view';
+import LiquidCanvas from './liquid-canvas';
+import IntroKnot from './intro-knot';
 type Page = 'works' | 'store' | 'contacts';
 const PATHS: Record<Page, string> = {
   works: '/',
@@ -298,9 +300,7 @@ export default function PortfolioView({
     );
   };
   return (
-    <main
-      className={`${paused ? 'motion-paused' : ''} page-${page}`}
-    >
+    <main className={`${paused ? 'motion-paused' : ''} page-${page}`}>
       <div className="scroll-progress" aria-hidden="true" />
       <CursorGlow enabled={!paused && !reduced} />
       <a className="skip-link" href="#main-content">
@@ -362,34 +362,45 @@ export default function PortfolioView({
       >
         {page === 'works' ? (
           <>
-            <section className="hero">
-              <h1 ref={title} tabIndex={-1}>
-                <span className="title-mask">
-                  <span>{t.heroLineOne}</span>
-                </span>
-                <span className="title-mask">
-                  <span className="title-chrome">{t.heroLineTwo}</span>
-                </span>
-              </h1>
-              <img
-                className="chrome"
-                src="/chrome.webp"
-                alt={t.chromeAlt}
-                width="1200"
-                height="800"
-                fetchPriority="high"
-              />
-              <div className="hero-bottom">
-                <p>
-                  {locale === 'ru'
-                    ? content.descriptionRu || content.description
-                    : content.description}
-                </p>
-                <a href="#works">
-                  {t.viewWork} <ArrowDown size={15} />
-                </a>
+            <div className="intro">
+              <div className="intro-stage">
+                <section className="hero" data-liquid>
+                  <span className="liquid hero-liquid" aria-hidden="true">
+                    <LiquidCanvas />
+                  </span>
+                  <IntroKnot />
+                  <span className="intro-hint" aria-hidden="true">
+                    SCROLL <ArrowDown size={12} />
+                  </span>
+                  <h1 ref={title} tabIndex={-1}>
+                    <span className="title-mask">
+                      <span>{t.heroLineOne}</span>
+                    </span>
+                    <span className="title-mask">
+                      <span className="title-chrome">{t.heroLineTwo}</span>
+                    </span>
+                  </h1>
+                  <img
+                    className="chrome"
+                    src="/chrome.webp"
+                    alt={t.chromeAlt}
+                    width="1200"
+                    height="800"
+                    fetchPriority="high"
+                  />
+                  <div className="hero-bottom">
+                    <p>
+                      {locale === 'ru'
+                        ? content.descriptionRu || content.description
+                        : content.description}
+                    </p>
+                    <a href="#works">
+                      {t.viewWork} <ArrowDown size={15} />
+                    </a>
+                  </div>
+                </section>
               </div>
-            </section>
+            </div>
             <section id="works" aria-label={t.worksAria}>
               <div className="section-label">
                 <span>{t.works}</span>
@@ -460,9 +471,7 @@ export default function PortfolioView({
             )}
             <section className="contact-teaser reveal">
               <a href="/contacts" onClick={(e) => navigate(e, 'contacts')}>
-                <span>
-                  {locale === 'ru' ? 'ОБСУДИМ?' : 'LET’S TALK.'}
-                </span>
+                <span>{locale === 'ru' ? 'ОБСУДИМ?' : 'LET’S TALK.'}</span>
                 <ArrowUpRight strokeWidth={0.8} />
               </a>
             </section>
@@ -495,7 +504,9 @@ export default function PortfolioView({
               />
             </div>
             <div className="contact-details">
-              <p className="reveal">{locale === 'ru' ? 'Напишите напрямую.' : 'Get in touch.'}</p>
+              <p className="reveal">
+                {locale === 'ru' ? 'Напишите напрямую.' : 'Get in touch.'}
+              </p>
               <div className="contact-links">
                 <div className="contact-methods">
                   <div
@@ -503,7 +514,12 @@ export default function PortfolioView({
                     style={{ '--delay': '0ms' } as React.CSSProperties}
                   >
                     <span className="contact-icon" aria-hidden="true">
-                      <img src="/media/contact-icons/instagram-chrome-transparent.png" alt="" width="96" height="96" />
+                      <img
+                        src="/media/contact-icons/instagram-chrome-transparent.png"
+                        alt=""
+                        width="96"
+                        height="96"
+                      />
                     </span>
                     <span className="contact-meta">INSTAGRAM</span>
                     {instagramUrl ? (
@@ -520,7 +536,12 @@ export default function PortfolioView({
                     style={{ '--delay': '90ms' } as React.CSSProperties}
                   >
                     <span className="contact-icon" aria-hidden="true">
-                      <img src="/media/contact-icons/youtube-chrome-transparent.png" alt="" width="96" height="96" />
+                      <img
+                        src="/media/contact-icons/youtube-chrome-transparent.png"
+                        alt=""
+                        width="96"
+                        height="96"
+                      />
                     </span>
                     <span className="contact-meta">YOUTUBE</span>
                     {youtubeUrl ? (
@@ -537,7 +558,12 @@ export default function PortfolioView({
                     style={{ '--delay': '180ms' } as React.CSSProperties}
                   >
                     <span className="contact-icon" aria-hidden="true">
-                      <img src="/media/contact-icons/phone-chrome-transparent.png" alt="" width="96" height="96" />
+                      <img
+                        src="/media/contact-icons/phone-chrome-transparent.png"
+                        alt=""
+                        width="96"
+                        height="96"
+                      />
                     </span>
                     <span className="contact-meta">{t.phone}</span>
                     {phoneHref ? (
@@ -554,7 +580,12 @@ export default function PortfolioView({
                     style={{ '--delay': '270ms' } as React.CSSProperties}
                   >
                     <span className="contact-icon" aria-hidden="true">
-                      <img src="/media/contact-icons/email-chrome-transparent.png" alt="" width="96" height="96" />
+                      <img
+                        src="/media/contact-icons/email-chrome-transparent.png"
+                        alt=""
+                        width="96"
+                        height="96"
+                      />
                     </span>
                     <span className="contact-meta">EMAIL</span>
                     {content.email ? (

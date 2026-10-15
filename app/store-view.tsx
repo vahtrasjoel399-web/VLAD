@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { productImage, safeLink, type Product } from '@/lib/content';
+import LiquidCanvas from './liquid-canvas';
 type Locale = 'en' | 'ru';
 
 const COPY = {
@@ -11,6 +12,7 @@ const COPY = {
     label: 'PRESETS / LUTS / TOOLS',
     empty: 'The store opens soon.',
     buy: 'Buy',
+    isNew: 'NEW',
     get: 'Get',
     free: 'Free',
     soon: 'Coming soon',
@@ -48,6 +50,7 @@ const COPY = {
     label: 'ПРЕСЕТЫ / LUT / ИНСТРУМЕНТЫ',
     empty: 'Магазин скоро откроется.',
     buy: 'Купить',
+    isNew: 'НОВИНКА',
     get: 'Получить',
     free: 'Бесплатно',
     soon: 'Скоро',
@@ -81,8 +84,6 @@ const COPY = {
   },
 } as const;
 
-// Oscillating transfer table: turns soft noise into liquid-metal bands.
-const LIQUID = '0 0 1 0.1 0.9 0 1 0.15 0.85 0 1 0 0';
 const SPARK =
   'M50 0C54 34 66 46 100 50 66 54 54 66 50 100 46 66 34 54 0 50 34 46 46 34 50 0Z';
 
@@ -162,7 +163,8 @@ function ProductCard({
     locale === 'ru'
       ? product.descriptionRu || product.description
       : product.description;
-  const image = imageError ? '' : productImage(product);
+  const image = imageError ? '' : productImage(product.image);
+  const hoverImage = image ? productImage(product.imageHover) : '';
   const checkout = safeLink(product.checkoutUrl);
   const free = product.price === 0;
   const price =
@@ -180,7 +182,9 @@ function ProductCard({
       className="product reveal"
       style={{ '--delay': `${(index % 3) * 90}ms` } as React.CSSProperties}
     >
-      <div className={`product-art ${image ? '' : 'is-empty'}`}>
+      <div
+        className={`product-art ${image ? '' : 'is-empty'} ${hoverImage ? 'has-hover' : ''}`}
+      >
         <span className="product-halftone" aria-hidden="true" />
         {image && (
           <img
@@ -190,9 +194,18 @@ function ProductCard({
             onError={() => setImageError(true)}
           />
         )}
+        {hoverImage && (
+          <img
+            className="product-hover-image"
+            src={hoverImage}
+            alt=""
+            loading="lazy"
+          />
+        )}
         <span className="product-tag" aria-hidden="true">
           [{String(index + 1).padStart(2, '0')}]
         </span>
+        {product.isNew && <span className="product-new">{t.isNew}</span>}
         <Spark className="product-glint" />
       </div>
       <div className="product-body">
@@ -252,27 +265,6 @@ export default function StoreView({
             <stop offset="0.8" stopColor="#cfcfcf" />
             <stop offset="1" stopColor="#fff" />
           </linearGradient>
-          <filter
-            id="store-liquid"
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.0035 0.008"
-              numOctaves="2"
-              seed="11"
-            />
-            <feColorMatrix values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" />
-            <feComponentTransfer>
-              <feFuncR type="table" tableValues={LIQUID} />
-              <feFuncG type="table" tableValues={LIQUID} />
-              <feFuncB type="table" tableValues={LIQUID} />
-            </feComponentTransfer>
-          </filter>
         </defs>
       </svg>
       <div className="contact-heading">
@@ -282,13 +274,15 @@ export default function StoreView({
           <span>{t.metaRight}</span>
         </div>
         <div className="store-deco" aria-hidden="true">
-          <span className="store-ring" />
-          <span className="store-ring" />
-          <span className="store-orbit" />
-          <span className="store-dots" />
-          <Spark className="store-spark" />
-          <Spark className="store-spark" />
-          <Spark className="store-spark" />
+          <span className="store-glow" />
+          <img
+            className="store-flower"
+            src="/media/store/chrome-flower.png"
+            alt=""
+            width="720"
+            height="905"
+            fetchPriority="high"
+          />
         </div>
         <h1 ref={titleRef} tabIndex={-1}>
           <span className="title-mask">
@@ -366,11 +360,14 @@ export default function StoreView({
           </div>
         </div>
       </div>
-      <a className="store-cta reveal" href="/contacts" onClick={onContact}>
-        <span className="store-liquid" aria-hidden="true">
-          <svg preserveAspectRatio="none">
-            <rect width="100%" height="100%" filter="url(#store-liquid)" />
-          </svg>
+      <a
+        className="store-cta reveal"
+        href="/contacts"
+        onClick={onContact}
+        data-liquid
+      >
+        <span className="liquid" aria-hidden="true">
+          <LiquidCanvas />
         </span>
         <span className="product-kind">{t.ctaEyebrow}</span>
         <strong>{t.cta}</strong>

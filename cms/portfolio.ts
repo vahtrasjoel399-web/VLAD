@@ -218,6 +218,20 @@ export default {
               options: { hotspot: false, accept: 'image/png,image/webp' },
             },
             {
+              name: 'imageHover',
+              title: 'Вторая картинка при наведении (PNG)',
+              type: 'image',
+              description:
+                'Необязательно. Плавно сменяет основную картинку при наведении, например вид коробки сзади.',
+              options: { hotspot: false, accept: 'image/png,image/webp' },
+            },
+            {
+              name: 'isNew',
+              title: 'Новинка (бейдж NEW)',
+              type: 'boolean',
+              initialValue: false,
+            },
+            {
               name: 'checkoutUrl',
               title: 'Ссылка на оплату (HTTPS)',
               type: 'url',
