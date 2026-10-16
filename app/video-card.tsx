@@ -215,6 +215,7 @@ export default function VideoCard({
   return (
     <article
       className="work reveal"
+      data-work={work.id}
       style={{ '--delay': `${(index % 3) * 85}ms` } as React.CSSProperties}
     >
       <div

@@ -232,6 +232,37 @@ export default function PortfolioView({
     document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
     return () => io.disconnect();
   }, [page]);
+  // No hover on touch screens: the card most in view plays its silent
+  // preview instead, one at a time, inside its own frame.
+  useEffect(() => {
+    if (page !== 'works' || paused || reduced || saveData || active) return;
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const ratios = new Map<string, number>();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = (entry.target as HTMLElement).dataset.work;
+          if (id) ratios.set(id, entry.intersectionRatio);
+        }
+        // Of the cards mostly on screen, play the one nearest the centre.
+        let best: string | null = null;
+        let nearest = Infinity;
+        for (const [id, ratio] of ratios) {
+          if (ratio < 0.6) continue;
+          const box = document
+            .querySelector(`[data-work="${CSS.escape(id)}"]`)
+            ?.getBoundingClientRect();
+          if (!box) continue;
+          const distance = Math.abs(box.top + box.height / 2 - innerHeight / 2);
+          if (distance < nearest) [best, nearest] = [id, distance];
+        }
+        setPreview(best);
+      },
+      { threshold: [0, 0.25, 0.5, 0.6, 0.75, 0.9, 1] },
+    );
+    document.querySelectorAll('[data-work]').forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [page, paused, reduced, saveData, active]);
   useEffect(() => {
     if (paused || reduced) setPreview(null);
   }, [paused, reduced]);

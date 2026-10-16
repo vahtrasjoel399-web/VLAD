@@ -46,7 +46,6 @@ void main() {
           + 0.34 * noise(p * 2.0 + vec2(-t * 0.03, t * 0.05) + 7.3);
   float v = 0.5 + 0.5 * sin(n * 31.0 + t * 0.45 + pull * 4.0);
   v = smoothstep(0.08, 0.92, v) + pull * 0.35;
-  v *= smoothstep(0.02, 0.6, uv.x + (1.0 - uv.y) * 0.12);
   gl_FragColor = vec4(vec3(clamp(v, 0.0, 1.0)), 1.0);
 }
 `;

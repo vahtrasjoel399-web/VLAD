@@ -2120,6 +2120,17 @@ header::before {
   z-index: -1;
   background: #000;
 }
+/* Soft fade under the header so the background does not end in a hard cut. */
+header::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  height: 48px;
+  background: linear-gradient(#000, rgba(0, 0, 0, 0));
+  pointer-events: none;
+}
 header[data-hidden='true'] {
   /* The entrance animation holds its end state, so drop it while hidden. */
   animation: none;
