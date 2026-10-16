@@ -127,7 +127,7 @@ export default function IntroKnot() {
             0.42 * Math.sin(3 * a),
           );
         };
-        const RADIUS = 0.2;
+        const RADIUS = 0.24;
         const RINGS = 220;
         const SIDES = 28;
 
@@ -160,14 +160,16 @@ export default function IntroKnot() {
 
         const assembly = new THREE.Group();
         scene.add(assembly);
-        const cap = new THREE.SphereGeometry(1, 32, 16);
-        // side: -1 comes from the left, 1 from the right.
+        const CAP = 10;
+        const ROWS = RINGS + 1 + CAP * 2;
+        // side: -1 comes from the left, 1 from the right. Each rod is one
+        // mesh: tail cap, body, head cap, so its rounded ends shade smoothly.
         const makeRod = (part: ReturnType<typeof knotPart>, side: number) => {
-          const count = (RINGS + 1) * (SIDES + 1);
+          const count = ROWS * (SIDES + 1);
           const position = new Float32Array(count * 3);
           const normals = new Float32Array(count * 3);
           const index: number[] = [];
-          for (let i = 0; i < RINGS; i++)
+          for (let i = 0; i < ROWS - 1; i++)
             for (let j = 0; j < SIDES; j++) {
               const a = i * (SIDES + 1) + j;
               const b = a + SIDES + 1;
@@ -185,21 +187,50 @@ export default function IntroKnot() {
           geo.setIndex(index);
           const mesh = new THREE.Mesh(geo, material);
           mesh.frustumCulled = false;
-          const tail = new THREE.Mesh(cap, material);
-          const head = new THREE.Mesh(cap, material);
-          assembly.add(mesh, tail, head);
+          assembly.add(mesh);
 
           const line = Array.from(
             { length: RINGS + 1 },
             () => new THREE.Vector3(),
           );
-          const t = new THREE.Vector3();
-          const n = new THREE.Vector3();
-          const b = new THREE.Vector3();
+          const tans = line.map(() => new THREE.Vector3());
+          const nors = line.map(() => new THREE.Vector3());
+          const bins = line.map(() => new THREE.Vector3());
           const straight = new THREE.Vector3();
+          const centre = new THREE.Vector3();
+          const frame = new THREE.Vector3();
+          // One ring of the tube: radius r around `at`, bulging along the
+          // tangent by `along` (for the rounded caps).
+          const ring = (
+            row: number,
+            at: InstanceType<typeof THREE.Vector3>,
+            i: number,
+            r: number,
+            cos: number,
+            sin: number,
+          ) => {
+            const n = nors[i];
+            const b = bins[i];
+            const t = tans[i];
+            for (let j = 0; j <= SIDES; j++) {
+              const th = (j / SIDES) * Math.PI * 2;
+              const c = Math.cos(th);
+              const sn = Math.sin(th);
+              const dx = c * n.x + sn * b.x;
+              const dy = c * n.y + sn * b.y;
+              const dz = c * n.z + sn * b.z;
+              const o = (row * (SIDES + 1) + j) * 3;
+              normals[o] = dx * cos + t.x * sin;
+              normals[o + 1] = dy * cos + t.y * sin;
+              normals[o + 2] = dz * cos + t.z * sin;
+              position[o] = at.x + dx * r;
+              position[o + 1] = at.y + dy * r;
+              position[o + 2] = at.z + dz * r;
+            }
+          };
           let last = '';
           // headX: where the straight rod's head is; coil: 0 straight .. 1 knotted.
-          return (headX: number, coil: number) => {
+          const update = (headX: number, coil: number) => {
             const key = `${headX.toFixed(5)}:${coil.toFixed(5)}`;
             if (key === last) return;
             last = key;
@@ -214,55 +245,67 @@ export default function IntroKnot() {
               const k = clamp(coil * 1.8 - (1 - u) * 0.8);
               const blend = k * k * (3 - 2 * k);
               const pt = line[i].copy(straight).lerp(part.pts[i], blend);
-              // Corkscrew twist while the rod is between straight and knotted.
-              const twist = Math.sin(Math.PI * blend) * 1.4 * side;
+              // Gentle corkscrew while the rod is between straight and knotted.
+              const twist = Math.sin(Math.PI * blend) * 0.9 * side;
               const cy = pt.y;
               const cz = pt.z;
               pt.y = cy * Math.cos(twist) - cz * Math.sin(twist);
               pt.z = cy * Math.sin(twist) + cz * Math.cos(twist);
             }
             // Parallel-transport frames along the current centre line.
-            n.set(0, 0, 1);
-            const taper = 1 - coil * coil * coil;
+            // A scratch vector: aliasing nors[0] here would skew the tail end.
+            const n = frame.set(0, 0, 1);
             for (let i = 0; i <= RINGS; i++) {
-              t.copy(line[Math.min(i + 1, RINGS)])
+              const t = tans[i]
+                .copy(line[Math.min(i + 1, RINGS)])
                 .sub(line[Math.max(i - 1, 0)])
                 .normalize();
+              if (i > 0) n.copy(nors[i - 1]);
               n.addScaledVector(t, -n.dot(t));
               if (n.lengthSq() < 1e-8) n.set(0, 1, 0).addScaledVector(t, -t.y);
               n.normalize();
-              b.crossVectors(t, n);
-              const r = RADIUS;
-              const pt = line[i];
-              for (let j = 0; j <= SIDES; j++) {
-                const th = (j / SIDES) * Math.PI * 2;
-                const c = Math.cos(th);
-                const sn = Math.sin(th);
-                const dx = c * n.x + sn * b.x;
-                const dy = c * n.y + sn * b.y;
-                const dz = c * n.z + sn * b.z;
-                const o = (i * (SIDES + 1) + j) * 3;
-                normals[o] = dx;
-                normals[o + 1] = dy;
-                normals[o + 2] = dz;
-                position[o] = pt.x + dx * r;
-                position[o + 1] = pt.y + dy * r;
-                position[o + 2] = pt.z + dz * r;
-              }
-              // Round tips while apart; they sink into the tube as the ends meet.
-              const tip = r * Math.min(1, taper * 6);
-              if (i === 0) {
-                tail.position.copy(pt);
-                tail.scale.setScalar(tip);
-              }
-              if (i === RINGS) {
-                head.position.copy(pt);
-                head.scale.setScalar(tip);
-              }
+              nors[i].copy(n);
+              bins[i].crossVectors(t, n);
+            }
+            // Round ends; they touch exactly when the knot closes, and the
+            // seamless tube takes over on that frame.
+            const radius = () => RADIUS;
+            const rTail = radius();
+            const rHead = radius();
+            for (let k = 0; k < CAP; k++) {
+              const phi = ((CAP - k) / CAP) * (Math.PI / 2);
+              centre
+                .copy(line[0])
+                .addScaledVector(tans[0], -rTail * Math.sin(phi));
+              ring(
+                k,
+                centre,
+                0,
+                rTail * Math.cos(phi),
+                Math.cos(phi),
+                -Math.sin(phi),
+              );
+            }
+            for (let i = 0; i <= RINGS; i++)
+              ring(CAP + i, line[i], i, RADIUS, 1, 0);
+            for (let k = 1; k <= CAP; k++) {
+              const phi = (k / CAP) * (Math.PI / 2);
+              centre
+                .copy(line[RINGS])
+                .addScaledVector(tans[RINGS], rHead * Math.sin(phi));
+              ring(
+                CAP + RINGS + k,
+                centre,
+                RINGS,
+                rHead * Math.cos(phi),
+                Math.cos(phi),
+                Math.sin(phi),
+              );
             }
             posAttr.needsUpdate = true;
             norAttr.needsUpdate = true;
           };
+          return { mesh, update };
         };
         const leftRod = makeRod(
           knotPart(tLeft, tRight > tLeft ? tRight : tRight + 1),
@@ -272,6 +315,17 @@ export default function IntroKnot() {
           knotPart(tRight, tLeft > tRight ? tLeft : tLeft + 1),
           1,
         );
+        // Once joined, the two rods are swapped for one seamless closed tube.
+        const loop = new THREE.CatmullRomCurve3(
+          Array.from({ length: 480 }, (_, i) => knot(i / 480)),
+          true,
+        );
+        const whole = new THREE.Mesh(
+          new THREE.TubeGeometry(loop, 640, RADIUS, 40, true),
+          material,
+        );
+        whole.visible = false;
+        assembly.add(whole);
 
         const state = {
           progress: 0,
@@ -315,10 +369,7 @@ export default function IntroKnot() {
           return camera.position.clone().add(dir.multiplyScalar(dist));
         };
 
-        const spinQ = new THREE.Quaternion();
-        const spinAxis = new THREE.Vector3(0.3, 1, 0.15).normalize();
-        const tilt = new THREE.Euler();
-        const tiltQ = new THREE.Quaternion();
+        const pose = new THREE.Euler();
         let last = performance.now();
         let frame = 0;
 
@@ -340,9 +391,12 @@ export default function IntroKnot() {
           const coilRaw = span(p, 0.14, JOIN);
           const join = coilRaw * coilRaw * (3 - 2 * coilRaw);
           // The knot only starts turning once the worms have closed it.
-          if (!calm) state.spin += dt * 0.35 * Math.pow(join, 6);
+          if (!calm) state.spin += dt * Math.pow(join, 6);
           const settle = ease(span(p, SETTLE, 1));
-          const mobile = canvas.clientWidth < 700;
+          // Phones and portrait tablets: knot sits above the title, smaller.
+          const mobile =
+            canvas.clientWidth < 700 ||
+            canvas.clientWidth < canvas.clientHeight * 0.9;
 
           // Centre while assembling, then beside the title.
           const centre = toWorld(0.5, 0.5);
@@ -351,25 +405,37 @@ export default function IntroKnot() {
           const scale =
             (mobile ? 0.72 : 1) * (1 - settle * (mobile ? 0.42 : 0.3));
 
-          tilt.set(state.my * 0.35, state.mx * 0.5, 0);
-          tiltQ.setFromEuler(tilt);
-          spinQ.setFromAxisAngle(spinAxis, state.spin);
-          assembly.quaternion.copy(tiltQ.multiply(spinQ));
+          // Face the viewer: turn slowly in its own plane and sway a little,
+          // so the trefoil always reads as a knot.
+          pose.set(
+            Math.sin(state.spin * 0.45) * 0.35 + state.my * 0.35,
+            Math.sin(state.spin * 0.31) * 0.45 + state.mx * 0.5,
+            state.spin * 0.22,
+          );
+          assembly.quaternion.setFromEuler(pose);
           assembly.position.set(pos.x, pos.y, 0);
           assembly.scale.setScalar(scale);
 
           // Heads start just inside the screen edges and stop near the centre.
           const edge = (toWorld(1, 0.5).x - centre.x) / scale;
           const reach = edge - 0.6 + (0.3 - edge + 0.6) * slide;
-          leftRod(-reach, join);
-          rightRod(reach, join);
+          // The rods reach the knot shape at CLOSE and hand over to one tube.
+          const CLOSE = 0.9;
+          const closed = join >= CLOSE;
+          whole.visible = closed;
+          leftRod.mesh.visible = !closed;
+          rightRod.mesh.visible = !closed;
+          if (!closed) {
+            leftRod.update(-reach, join / CLOSE);
+            rightRod.update(reach, join / CLOSE);
+          }
 
           // A burst of light along the seam when the halves meet.
-          if (join > 0.995 && !state.joined) {
+          if (join >= 0.9 && !state.joined) {
             state.joined = true;
             state.flash = 1;
             intro.classList.add('is-joined');
-          } else if (join < 0.9 && state.joined) {
+          } else if (join < 0.85 && state.joined) {
             state.joined = false;
             intro.classList.remove('is-joined');
           }

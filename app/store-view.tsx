@@ -95,35 +95,6 @@ function Spark({ className }: { className: string }) {
   );
 }
 
-// Wireframe sphere drawn from a circle, meridians and parallels.
-function WireGlobe() {
-  return (
-    <svg className="store-globe" viewBox="0 0 200 200" aria-hidden="true">
-      <g fill="none" stroke="#c4c4c4" strokeWidth="0.9">
-        <circle cx="100" cy="100" r="96" />
-        {[83, 48, 14].map((rx) => (
-          <ellipse key={rx} cx="100" cy="100" rx={rx} ry="96" />
-        ))}
-        {[
-          [0, 96],
-          [32, 90.5],
-          [-32, 90.5],
-          [64, 71.6],
-          [-64, 71.6],
-        ].map(([y, half]) => (
-          <line
-            key={y}
-            x1={100 - half}
-            x2={100 + half}
-            y1={100 + y}
-            y2={100 + y}
-          />
-        ))}
-      </g>
-    </svg>
-  );
-}
-
 function Ticker({ words }: { words: readonly string[] }) {
   const items = Array.from({ length: 8 }, (_, i) => words[i % words.length]);
   const group = (hidden: boolean) => (
@@ -339,7 +310,14 @@ export default function StoreView({
             ))}
           </ol>
           <div className="store-side">
-            <WireGlobe />
+            <img
+              className="store-globe"
+              src="/media/store/chrome-globe.png"
+              alt=""
+              width="600"
+              height="600"
+              loading="lazy"
+            />
             <dl>
               {t.facts.map(([term, value]) => (
                 <div key={term}>
@@ -369,6 +347,14 @@ export default function StoreView({
         <span className="liquid" aria-hidden="true">
           <LiquidCanvas />
         </span>
+        <img
+          className="store-cta-logo"
+          src="/media/logo/smolin-logo.png"
+          alt=""
+          width="1600"
+          height="799"
+          loading="lazy"
+        />
         <span className="product-kind">{t.ctaEyebrow}</span>
         <strong>{t.cta}</strong>
         <span className="store-cta-link">

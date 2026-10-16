@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { safeLink, type Portfolio } from '@/lib/content';
 import VideoCard from './video-card';
-import CursorGlow from './cursor-glow';
 import StoreView from './store-view';
 import LiquidCanvas from './liquid-canvas';
 import IntroKnot from './intro-knot';
@@ -27,6 +26,8 @@ const COPY = {
   en: {
     skip: 'Skip to content',
     navLabel: 'Main navigation',
+    menu: 'Open menu',
+    close: 'Close menu',
     works: 'Work',
     store: 'Store',
     contacts: 'Contact',
@@ -60,7 +61,6 @@ const COPY = {
     contactEyebrowSub: 'EVERY GOOD FILM STARTS WITH A CONVERSATION',
     contactHeadingOne: 'LET’S',
     contactHeadingTwo: 'TALK.',
-    contactChromeAlt: 'Chrome sculpture',
     contactLeadOne: 'One idea.',
     contactLeadTwo: 'A thousand ways',
     contactLeadThree: 'to tell it.',
@@ -81,6 +81,8 @@ const COPY = {
   ru: {
     skip: 'К содержимому',
     navLabel: 'Основная навигация',
+    menu: 'Открыть меню',
+    close: 'Закрыть меню',
     works: 'Работы',
     store: 'Магазин',
     contacts: 'Контакты',
@@ -114,7 +116,6 @@ const COPY = {
     contactEyebrowSub: 'КАЖДЫЙ ХОРОШИЙ ФИЛЬМ НАЧИНАЕТСЯ С РАЗГОВОРА',
     contactHeadingOne: 'ДАВАЙТЕ',
     contactHeadingTwo: 'ОБСУДИМ.',
-    contactChromeAlt: 'Хромированная скульптура',
     contactLeadOne: 'Одна идея.',
     contactLeadTwo: 'Тысяча способов',
     contactLeadThree: 'рассказать её.',
@@ -150,6 +151,10 @@ export default function PortfolioView({
   const [transition, setTransition] = useState(0);
   const [saveData, setSaveData] = useState(false);
   const [locale, setLocale] = useState<Locale>('en');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const burger = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLElement>(null);
+  const header = useRef<HTMLElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
   const t = COPY[locale];
   const works = [...content.works].sort((a, b) => a.order - b.order);
@@ -230,10 +235,57 @@ export default function PortfolioView({
   useEffect(() => {
     if (paused || reduced) setPreview(null);
   }, [paused, reduced]);
+  // Header hides while scrolling down and returns on the way up. On the home
+  // page it stays until the hero has scrolled off after the intro.
+  useEffect(() => {
+    let last = scrollY;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const el = header.current;
+      if (!el) return;
+      const y = scrollY;
+      const intro = document.querySelector<HTMLElement>('.intro');
+      const start = intro
+        ? intro.offsetTop + intro.offsetHeight
+        : 120;
+      if (menuOpen || y < start || y < last - 4) el.dataset.hidden = 'false';
+      else if (y > last + 4) el.dataset.hidden = 'true';
+      if (Math.abs(y - last) > 4) last = y;
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      removeEventListener('scroll', onScroll);
+    };
+  }, [page, menuOpen]);
+  // Full-screen menu: lock the page behind it, move focus into it, Esc closes.
+  useEffect(() => {
+    if (!menuOpen) return;
+    // Lock on body: locking <html> would unstick the sticky header.
+    const body = document.body;
+    body.style.overflow = 'hidden';
+    menu.current?.focus({ preventScroll: true });
+    const key = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setMenuOpen(false);
+      burger.current?.focus();
+    };
+    addEventListener('keydown', key);
+    return () => {
+      body.style.overflow = '';
+      removeEventListener('keydown', key);
+    };
+  }, [menuOpen]);
   const navigate = (event: React.MouseEvent<HTMLAnchorElement>, next: Page) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
       return;
     event.preventDefault();
+    setMenuOpen(false);
     if (next === page) {
       if (next === 'works')
         document
@@ -302,39 +354,19 @@ export default function PortfolioView({
   return (
     <main className={`${paused ? 'motion-paused' : ''} page-${page}`}>
       <div className="scroll-progress" aria-hidden="true" />
-      <CursorGlow enabled={!paused && !reduced} />
       <a className="skip-link" href="#main-content">
         {t.skip}
       </a>
-      <header>
+      <header ref={header}>
         <a className="wordmark" href="/" onClick={(e) => navigate(e, 'works')}>
-          {content.name}
-          <span>®</span>
+          <img
+            src="/media/logo/smolin-logo.png"
+            alt={content.name}
+            width="1600"
+            height="799"
+          />
         </a>
         <div className="header-actions">
-          <nav aria-label={t.navLabel}>
-            <a
-              href="/"
-              aria-current={page === 'works' ? 'page' : undefined}
-              onClick={(e) => navigate(e, 'works')}
-            >
-              {t.works} <sup>{String(works.length).padStart(2, '0')}</sup>
-            </a>
-            <a
-              href="/store"
-              aria-current={page === 'store' ? 'page' : undefined}
-              onClick={(e) => navigate(e, 'store')}
-            >
-              {t.store}
-            </a>
-            <a
-              href="/contacts"
-              aria-current={page === 'contacts' ? 'page' : undefined}
-              onClick={(e) => navigate(e, 'contacts')}
-            >
-              {t.contacts} <ArrowUpRight size={14} />
-            </a>
-          </nav>
           <div className="language-switch" aria-label={t.language}>
             <button
               type="button"
@@ -352,8 +384,62 @@ export default function PortfolioView({
               RU
             </button>
           </div>
+          <button
+            ref={burger}
+            type="button"
+            className="burger"
+            aria-expanded={menuOpen}
+            aria-controls="site-menu"
+            aria-label={menuOpen ? t.close : t.menu}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span />
+            <span />
+          </button>
         </div>
       </header>
+      <nav
+        id="site-menu"
+        ref={menu}
+        className={`site-menu ${menuOpen ? 'is-open' : ''}`}
+        aria-label={t.navLabel}
+        tabIndex={-1}
+        inert={!menuOpen}
+      >
+        {(
+          [
+            ['works', '/', t.works, String(works.length).padStart(2, '0')],
+            ['store', '/store', t.store, ''],
+            ['contacts', '/contacts', t.contacts, ''],
+          ] as const
+        ).map(([key, href, label, count], i) => (
+          <a
+            key={key}
+            href={href}
+            aria-current={page === key ? 'page' : undefined}
+            onClick={(e) => navigate(e, key)}
+            style={{ '--i': i } as React.CSSProperties}
+          >
+            <span className="site-menu-index">0{i + 1}</span>
+            <span className="site-menu-label">{label}</span>
+            {count && <sup>{count}</sup>}
+          </a>
+        ))}
+        <div className="site-menu-foot">
+          {content.socials
+            .filter((social) => safeLink(social.url))
+            .map((social) => (
+              <a
+                key={social.name}
+                href={social.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {social.name} <ArrowUpRight size={13} />
+              </a>
+            ))}
+        </div>
+      </nav>
       <div
         key={transition}
         className="page-content"
@@ -496,11 +582,11 @@ export default function PortfolioView({
                 </span>
               </h1>
               <img
-                className="contact-chrome"
-                src="/chrome.webp"
-                alt={t.contactChromeAlt}
-                width="1200"
-                height="800"
+                className="contact-chrome contact-logo"
+                src="/media/logo/smolin-logo.png"
+                alt={content.name}
+                width="1600"
+                height="799"
               />
             </div>
             <div className="contact-details">
