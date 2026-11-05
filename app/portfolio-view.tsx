@@ -6,19 +6,22 @@ import {
   ArrowRight,
   Copy,
   Check,
+  Lock,
   Pause,
   Play,
 } from 'lucide-react';
 import { safeLink, type Portfolio } from '@/lib/content';
 import VideoCard from './video-card';
 import StoreView from './store-view';
+import ThanksView from './thanks-view';
 import LiquidCanvas from './liquid-canvas';
-import IntroKnot from './intro-knot';
-type Page = 'works' | 'store' | 'contacts';
+import LiquidFigure from './liquid-figure';
+type Page = 'works' | 'store' | 'contacts' | 'thanks';
 const PATHS: Record<Page, string> = {
   works: '/',
   store: '/store',
   contacts: '/contacts',
+  thanks: '/thanks',
 };
 type Locale = 'en' | 'ru';
 
@@ -77,6 +80,7 @@ const COPY = {
     motionOn: 'Enable motion',
     motionOff: 'Pause motion',
     creatorLabel: 'VIDEO CREATOR',
+    securePayment: 'Secure payment via Stripe',
   },
   ru: {
     skip: 'К содержимому',
@@ -132,6 +136,7 @@ const COPY = {
     motionOn: 'Включить движение',
     motionOff: 'Остановить движение',
     creatorLabel: 'ВИДЕОКРЕАТОР',
+    securePayment: 'Безопасная оплата через Stripe',
   },
 } as const;
 
@@ -196,7 +201,9 @@ export default function PortfolioView({
           ? 'contacts'
           : location.pathname === '/store'
             ? 'store'
-            : 'works',
+            : location.pathname === '/thanks'
+              ? 'thanks'
+              : 'works',
       );
       setActive(null);
       setPreview(null);
@@ -267,7 +274,7 @@ export default function PortfolioView({
     if (paused || reduced) setPreview(null);
   }, [paused, reduced]);
   // Header hides while scrolling down and returns on the way up. On the home
-  // page it stays until the hero has scrolled off after the intro.
+  // page it stays until the hero has scrolled off.
   useEffect(() => {
     let last = scrollY;
     let frame = 0;
@@ -276,10 +283,8 @@ export default function PortfolioView({
       const el = header.current;
       if (!el) return;
       const y = scrollY;
-      const intro = document.querySelector<HTMLElement>('.intro');
-      const start = intro
-        ? intro.offsetTop + intro.offsetHeight
-        : 120;
+      const hero = document.querySelector<HTMLElement>('.hero');
+      const start = hero ? hero.offsetTop + hero.offsetHeight : 120;
       if (menuOpen || y < start || y < last - 4) el.dataset.hidden = 'false';
       else if (y > last + 4) el.dataset.hidden = 'true';
       if (Math.abs(y - last) > 4) last = y;
@@ -398,6 +403,27 @@ export default function PortfolioView({
           />
         </a>
         <div className="header-actions">
+          {/* Direct links, so the store is one click from anywhere. On phones
+              only Store stays here; the rest live in the burger menu. */}
+          <nav className="header-nav" aria-label={t.navLabel}>
+            {(
+              [
+                ['works', '/', t.works],
+                ['store', '/store', t.store],
+                ['contacts', '/contacts', t.contacts],
+              ] as const
+            ).map(([key, href, label]) => (
+              <a
+                key={key}
+                href={href}
+                className={key === 'store' ? 'header-store' : undefined}
+                aria-current={page === key ? 'page' : undefined}
+                onClick={(e) => navigate(e, key)}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
           <div className="language-switch" aria-label={t.language}>
             <button
               type="button"
@@ -479,45 +505,38 @@ export default function PortfolioView({
       >
         {page === 'works' ? (
           <>
-            <div className="intro">
-              <div className="intro-stage">
-                <section className="hero" data-liquid>
-                  <span className="liquid hero-liquid" aria-hidden="true">
-                    <LiquidCanvas />
-                  </span>
-                  <IntroKnot />
-                  <span className="intro-hint" aria-hidden="true">
-                    SCROLL <ArrowDown size={12} />
-                  </span>
-                  <h1 ref={title} tabIndex={-1}>
-                    <span className="title-mask">
-                      <span>{t.heroLineOne}</span>
-                    </span>
-                    <span className="title-mask">
-                      <span className="title-chrome">{t.heroLineTwo}</span>
-                    </span>
-                  </h1>
-                  <img
-                    className="chrome"
-                    src="/chrome.webp"
-                    alt={t.chromeAlt}
-                    width="1200"
-                    height="800"
-                    fetchPriority="high"
-                  />
-                  <div className="hero-bottom">
-                    <p>
-                      {locale === 'ru'
-                        ? content.descriptionRu || content.description
-                        : content.description}
-                    </p>
-                    <a href="#works">
-                      {t.viewWork} <ArrowDown size={15} />
-                    </a>
-                  </div>
-                </section>
+            <section className="hero" data-liquid>
+              <span className="liquid hero-liquid" aria-hidden="true">
+                <LiquidCanvas />
+              </span>
+              <LiquidFigure />
+              <h1 ref={title} tabIndex={-1}>
+                <span className="title-mask">
+                  <span>{t.heroLineOne}</span>
+                </span>
+                <span className="title-mask">
+                  <span className="title-chrome">{t.heroLineTwo}</span>
+                </span>
+              </h1>
+              <img
+                className="chrome"
+                src="/chrome.webp"
+                alt={t.chromeAlt}
+                width="1200"
+                height="800"
+                fetchPriority="high"
+              />
+              <div className="hero-bottom">
+                <p>
+                  {locale === 'ru'
+                    ? content.descriptionRu || content.description
+                    : content.description}
+                </p>
+                <a href="#works">
+                  {t.viewWork} <ArrowDown size={15} />
+                </a>
               </div>
-            </div>
+            </section>
             <section id="works" aria-label={t.worksAria}>
               <div className="section-label">
                 <span>{t.works}</span>
@@ -586,7 +605,10 @@ export default function PortfolioView({
                 </div>
               </section>
             )}
-            <section className="contact-teaser reveal">
+            <section className="contact-teaser reveal" data-liquid>
+              <span className="liquid teaser-liquid" aria-hidden="true">
+                <LiquidCanvas />
+              </span>
               <a href="/contacts" onClick={(e) => navigate(e, 'contacts')}>
                 <span>{locale === 'ru' ? 'ОБСУДИМ?' : 'LET’S TALK.'}</span>
                 <ArrowUpRight strokeWidth={0.8} />
@@ -601,8 +623,18 @@ export default function PortfolioView({
             onBack={(e) => navigate(e, 'works')}
             onContact={(e) => navigate(e, 'contacts')}
           />
+        ) : page === 'thanks' ? (
+          <ThanksView
+            locale={locale}
+            titleRef={title}
+            onStore={(e) => navigate(e, 'store')}
+            onContact={(e) => navigate(e, 'contacts')}
+          />
         ) : (
-          <section className="contacts">
+          <section className="contacts" data-liquid>
+            <span className="liquid page-liquid" aria-hidden="true">
+              <LiquidCanvas />
+            </span>
             <div className="contact-heading">
               <h1 ref={title} tabIndex={-1}>
                 <span className="title-mask">
@@ -771,6 +803,9 @@ export default function PortfolioView({
           {paused || reduced ? <Play size={12} /> : <Pause size={12} />}{' '}
           {reduced ? t.reduced : paused ? t.motionOn : t.motionOff}
         </button>
+        <span className="footer-secure">
+          <Lock size={11} aria-hidden="true" /> {t.securePayment}
+        </span>
         <span>© {new Date().getFullYear()}</span>
       </footer>
     </main>

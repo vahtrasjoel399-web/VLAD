@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { productImage, safeLink, type Product } from '@/lib/content';
+import { productImage, type Product } from '@/lib/content';
+import { checkoutLink } from '@/lib/payment-links';
 import LiquidCanvas from './liquid-canvas';
 type Locale = 'en' | 'ru';
 
@@ -13,7 +14,7 @@ const COPY = {
     empty: 'The store opens soon.',
     buy: 'Buy',
     isNew: 'NEW',
-    get: 'Get',
+    get: 'Get it free',
     free: 'Free',
     soon: 'Coming soon',
     back: 'Back to work',
@@ -51,7 +52,7 @@ const COPY = {
     empty: 'Магазин скоро откроется.',
     buy: 'Купить',
     isNew: 'НОВИНКА',
-    get: 'Получить',
+    get: 'Получить бесплатно',
     free: 'Бесплатно',
     soon: 'Скоро',
     back: 'Вернуться к работам',
@@ -121,10 +122,12 @@ function ProductCard({
   product,
   index,
   locale,
+  featured,
 }: {
   product: Product;
   index: number;
   locale: Locale;
+  featured: boolean;
 }) {
   const [imageError, setImageError] = useState(false);
   const t = COPY[locale];
@@ -136,7 +139,7 @@ function ProductCard({
       : product.description;
   const image = imageError ? '' : productImage(product.image);
   const hoverImage = image ? productImage(product.imageHover) : '';
-  const checkout = safeLink(product.checkoutUrl);
+  const checkout = checkoutLink(product);
   const free = product.price === 0;
   const price =
     typeof product.price !== 'number'
@@ -150,24 +153,35 @@ function ProductCard({
           }).format(product.price);
   return (
     <article
-      className="product reveal"
+      className={`product reveal ${featured ? 'is-featured' : ''}`}
       style={{ '--delay': `${(index % 3) * 90}ms` } as React.CSSProperties}
     >
       <div
         className={`product-art ${image ? '' : 'is-empty'} ${hoverImage ? 'has-hover' : ''}`}
       >
         <span className="product-halftone" aria-hidden="true" />
+        {image && <span className="product-floor" aria-hidden="true" />}
         {image && (
           <img
+            className="product-image"
             src={image}
             alt={title}
-            loading="lazy"
+            loading={featured ? 'eager' : 'lazy'}
             onError={() => setImageError(true)}
+          />
+        )}
+        {image && (
+          <img
+            className="product-reflection"
+            src={image}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
           />
         )}
         {hoverImage && (
           <img
-            className="product-hover-image"
+            className="product-image product-hover-image"
             src={hoverImage}
             alt=""
             loading="lazy"
@@ -179,28 +193,36 @@ function ProductCard({
         {product.isNew && <span className="product-new">{t.isNew}</span>}
         <Spark className="product-glint" />
       </div>
-      <div className="product-body">
-        <div className="product-head">
-          <h2>{title}</h2>
-          {price && <span className="product-price">{price}</span>}
+      <div className="product-info">
+        <div className="product-body">
+          {product.category && (
+            <span className="product-kind">[{product.category}]</span>
+          )}
+          <div className="product-head">
+            <h2>{title}</h2>
+            {price && <span className="product-price">{price}</span>}
+          </div>
+          {description && <p className="product-copy">{description}</p>}
         </div>
-        {product.category && (
-          <span className="product-kind">[{product.category}]</span>
+        {checkout ? (
+          <a
+            className="product-buy"
+            href={checkout}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>
+              {free ? t.get : t.buy}
+              {!free && price && (
+                <span className="product-buy-price"> · {price}</span>
+              )}
+            </span>
+            <ArrowUpRight size={16} />
+          </a>
+        ) : (
+          <span className="product-buy is-soon">{t.soon}</span>
         )}
-        {description && <p className="product-copy">{description}</p>}
       </div>
-      {checkout ? (
-        <a
-          className="product-buy"
-          href={checkout}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {free ? t.get : t.buy} <ArrowUpRight size={15} />
-        </a>
-      ) : (
-        <span className="product-buy is-soon">{t.soon}</span>
-      )}
     </article>
   );
 }
@@ -280,6 +302,7 @@ export default function StoreView({
               product={product}
               index={index}
               locale={locale}
+              featured={index === 0}
             />
           ))}
         </div>

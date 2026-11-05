@@ -22,10 +22,19 @@ export default defineConfig({
           .title('Админка')
           .items([
             S.listItem()
-              .title('Портфолио')
+              .title('Портфолио — видео и контакты')
               .id('portfolio')
               .child(
                 S.document().schemaType('portfolio').documentId('portfolio'),
+              ),
+            S.listItem()
+              .title('Магазин — товары')
+              .id('store')
+              .schemaType('product')
+              .child(
+                S.documentTypeList('product')
+                  .title('Магазин — товары')
+                  .defaultOrdering([{ field: 'order', direction: 'asc' }]),
               ),
           ]),
     }),
