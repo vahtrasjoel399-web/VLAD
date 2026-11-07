@@ -72,7 +72,8 @@ export function posterSource(work: Work) {
       : '')
   );
 }
-export function productImage(src = '') {
+export function productImage(src?: string | null) {
+  if (!src) return '';
   return src.startsWith('https://cdn.sanity.io/')
     ? `${src}?w=1200&fit=max&auto=format`
     : src;
@@ -104,6 +105,13 @@ export async function getContent(): Promise<Portfolio> {
     socials: result.socials || [],
     description: result.description || '',
     roles: result.roles || '',
-    products: result.products || [],
+    // Sanity sends empty optional fields as null; drop them so the
+    // "?" fields on Product really are undefined.
+    products: (result.products || []).map(
+      (product) =>
+        Object.fromEntries(
+          Object.entries(product).filter(([, value]) => value !== null),
+        ) as Product,
+    ),
   };
 }

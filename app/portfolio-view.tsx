@@ -15,6 +15,7 @@ import StoreView from './store-view';
 import ThanksView from './thanks-view';
 import LiquidCanvas from './liquid-canvas';
 import LiquidFigure from './liquid-figure';
+import ContactTitle3D from './contact-title-3d';
 type Page = 'works' | 'store' | 'contacts' | 'thanks';
 // What the thanks page shows after a protected-store payment.
 export type DownloadInfo =
@@ -190,9 +191,6 @@ export default function PortfolioView({
       social.url.toLowerCase().includes('youtu.be'),
   );
   const youtubeUrl = safeLink(youtube?.url);
-  const phoneHref = content.phone
-    ? `tel:${content.phone.replace(/[^+\d]/g, '')}`
-    : undefined;
   useEffect(() => {
     const savedLocale = localStorage.getItem('smolin-locale');
     if (savedLocale === 'ru') setLocale('ru');
@@ -639,6 +637,7 @@ export default function PortfolioView({
             <span className="liquid page-liquid" aria-hidden="true">
               <LiquidCanvas />
             </span>
+            <div className="contact-main">
             <div className="contact-heading">
               <h1 ref={title} tabIndex={-1}>
                 <span className="title-mask">
@@ -648,13 +647,7 @@ export default function PortfolioView({
                   <span className="title-chrome">{t.contactHeadingTwo}</span>
                 </span>
               </h1>
-              <img
-                className="contact-chrome contact-logo"
-                src="/media/logo/smolin-logo.png"
-                alt={content.name}
-                width="1600"
-                height="799"
-              />
+              <ContactTitle3D />
             </div>
             <div className="contact-details">
               <p className="reveal">
@@ -712,28 +705,6 @@ export default function PortfolioView({
                   >
                     <span className="contact-icon" aria-hidden="true">
                       <img
-                        src="/media/contact-icons/phone-chrome-transparent.png"
-                        alt=""
-                        width="96"
-                        height="96"
-                      />
-                    </span>
-                    <span className="contact-meta">{t.phone}</span>
-                    {phoneHref ? (
-                      <a href={phoneHref}>
-                        {content.phone}
-                        <ArrowUpRight size={18} />
-                      </a>
-                    ) : (
-                      <span className="contact-unset">{t.notAdded}</span>
-                    )}
-                  </div>
-                  <div
-                    className="contact-method reveal"
-                    style={{ '--delay': '270ms' } as React.CSSProperties}
-                  >
-                    <span className="contact-icon" aria-hidden="true">
-                      <img
                         src="/media/contact-icons/email-chrome-transparent.png"
                         alt=""
                         width="96"
@@ -785,6 +756,7 @@ export default function PortfolioView({
                 </div>
                 {content.demo && <p className="demo-note">{t.demoContact}</p>}
               </div>
+            </div>
             </div>
             <a
               className="back-link reveal"

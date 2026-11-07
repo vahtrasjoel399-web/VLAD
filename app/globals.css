@@ -2174,9 +2174,6 @@ nav.site-menu sup {
 .has-store .wordmark {
   max-width: none !important;
 }
-.contact-logo {
-  mask-image: none;
-}
 .store-cta-logo {
   position: absolute;
   top: 50%;
@@ -2199,19 +2196,6 @@ nav.site-menu sup {
   }
 }
 
-/* The logo replaced a centred chrome blob; keep it inside the screen on phones. */
-/* Clip the logo's overhang at the heading, so the page liquid can bleed. */
-.contacts .contact-heading {
-  overflow-x: clip;
-}
-@media (max-width: 600px) {
-  .contact-logo {
-    top: -6%;
-    right: 0;
-    width: 64%;
-    height: auto;
-  }
-}
 /* Thank-you page after Stripe checkout. */
 .thanks {
   padding: 30px 0 60px;
@@ -2633,8 +2617,73 @@ footer .footer-license:hover {
 @media (max-width: 600px) {
   .hero-figure,
   .hero .chrome,
-  .contacts .contact-logo,
   .store-cta-logo {
     display: none;
+  }
+}
+
+/* Contacts: LET'S TALK as 3D liquid chrome on the left, the contact list
+   beside it on the right. The real heading stays for layout and screen
+   readers but turns transparent once the 3D letters are drawn. */
+.contact-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 64px;
+  align-items: center;
+  padding: 48px 0 40px;
+}
+.contact-main .contact-heading {
+  container-type: inline-size;
+}
+.contact-main .contact-heading h1 {
+  font-size: min(clamp(100px, 16vw, 260px), 40cqi);
+  line-height: 0.98;
+  margin: 0;
+}
+/* ДАВАЙТЕ ОБСУДИМ is longer: size it to the column so it never runs into
+   the contact list. */
+html:lang(ru) .contact-main .contact-heading h1 {
+  font-size: 22cqi;
+}
+.has-3d-title h1,
+.has-3d-title h1 .title-chrome {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background: none;
+}
+.contact-title-3d {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  animation: contact-title-in 1s var(--ease) both;
+}
+@keyframes contact-title-in {
+  from {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+.contact-main .contact-details {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-top: 0;
+  padding: 0;
+}
+.contact-main .contact-details > p {
+  font-size: 24px;
+}
+@media (max-width: 950px) {
+  .contact-main {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-top: 40px;
+  }
+  .contact-main .contact-heading h1 {
+    font-size: clamp(80px, 21vw, 170px);
+  }
+}
+@media (max-width: 600px) {
+  .contact-main .contact-heading h1 {
+    font-size: 31vw;
   }
 }
