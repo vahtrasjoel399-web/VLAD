@@ -538,13 +538,6 @@ export default function PortfolioView({
                 height="800"
                 fetchPriority="high"
               />
-              <div className="hero-bottom">
-                <p>
-                  {locale === 'ru'
-                    ? content.descriptionRu || content.description
-                    : content.description}
-                </p>
-              </div>
             </section>
             <section id="works" aria-label={t.worksAria}>
               <div className="section-label">
