@@ -73,7 +73,7 @@ const COPY = {
     contactEyebrow: '03 / GET IN TOUCH',
     contactEyebrowSub: 'EVERY GOOD FILM STARTS WITH A CONVERSATION',
     contactHeadingOne: 'LET’S',
-    contactHeadingTwo: 'TALK.',
+    contactHeadingTwo: 'TALK',
     contactLeadOne: 'One idea.',
     contactLeadTwo: 'A thousand ways',
     contactLeadThree: 'to tell it.',
@@ -129,7 +129,7 @@ const COPY = {
     contactEyebrow: '03 / СВЯЗАТЬСЯ',
     contactEyebrowSub: 'КАЖДЫЙ ХОРОШИЙ ФИЛЬМ НАЧИНАЕТСЯ С РАЗГОВОРА',
     contactHeadingOne: 'ДАВАЙТЕ',
-    contactHeadingTwo: 'ОБСУДИМ.',
+    contactHeadingTwo: 'ОБСУДИМ',
     contactLeadOne: 'Одна идея.',
     contactLeadTwo: 'Тысяча способов',
     contactLeadThree: 'рассказать её.',
@@ -610,7 +610,7 @@ export default function PortfolioView({
                 <LiquidCanvas />
               </span>
               <a href="/contacts" onClick={(e) => navigate(e, 'contacts')}>
-                <span>{locale === 'ru' ? 'ОБСУДИМ?' : 'LET’S TALK.'}</span>
+                <span>{locale === 'ru' ? 'ОБСУДИМ?' : 'LET’S TALK'}</span>
                 <ArrowUpRight strokeWidth={0.8} />
               </a>
             </section>
@@ -736,12 +736,8 @@ export default function PortfolioView({
                 </div>
                 <div className="socials">
                   {content.socials
-                    .filter(
-                      (s) =>
-                        safeLink(s.url) &&
-                        !s.name.toLowerCase().includes('instagram') &&
-                        !s.url.toLowerCase().includes('instagram.com'),
-                    )
+                    // Instagram and YouTube already have their own rows above.
+                    .filter((s) => safeLink(s.url) && s !== instagram && s !== youtube)
                     .map((s) => (
                       <a
                         key={s.name}
