@@ -146,21 +146,27 @@ export default function ContactTitle3D() {
       const word = new THREE.Group();
       scene.add(word);
 
+      // Detail level: enough triangles for the surface to bend smoothly,
+      // fewer on phones. (The first version took 1–2 s per word to build.)
+      const light = matchMedia('(pointer: coarse)').matches || innerWidth < 700;
+      const cache = new Map<string, { g: BufferGeometry; centre: Vector3 }>();
       const makeLetter = (ch: string) => {
+        const cached = cache.get(ch);
+        if (cached) return cached;
         let g: BufferGeometry = new TextGeometry(ch, {
           font,
           size: SIZE,
           depth: SIZE * 0.04,
-          curveSegments: 24,
+          curveSegments: light ? 10 : 12,
           bevelEnabled: true,
           // Deep, round bevel growing outward: puffy edges. (An inward
           // offset broke the front faces at inner corners.)
           bevelThickness: SIZE * 0.15,
           bevelSize: SIZE * 0.055,
-          bevelSegments: 14,
+          bevelSegments: light ? 6 : 8,
         });
         // Small triangles everywhere, so even the flat faces can bend.
-        g = new TessellateModifier(SIZE * 0.035, 10).modify(g);
+        g = new TessellateModifier(SIZE * (light ? 0.08 : 0.06), 10).modify(g);
         // Merge the extruded faces and smooth the normals: rounded, puffy.
         g.deleteAttribute('normal');
         g.deleteAttribute('uv');
@@ -183,14 +189,14 @@ export default function ContactTitle3D() {
         g.boundingBox!.getCenter(centre);
         g.translate(-centre.x, -centre.y, -centre.z);
         geometries.push(g);
-        return { g, centre };
+        const letter = { g, centre };
+        cache.set(ch, letter);
+        return letter;
       };
 
       const build = () => {
         for (const l of letters) word.remove(l.mesh);
         letters.length = 0;
-        for (const g of geometries) g.dispose();
-        geometries.length = 0;
         const spans = [...h1.querySelectorAll<HTMLElement>('.title-mask > span')];
         const lines = spans.map((s) => (s.textContent || '').toUpperCase().replace(/’/g, "'"));
         // Where each line sits in the page (left, right or between), so the
@@ -277,16 +283,32 @@ export default function ContactTitle3D() {
         camera.updateProjectionMatrix();
       };
 
-      // Measure the heading only after its entrance animation has finished.
-      await Promise.all(
-        h1
-          .getAnimations({ subtree: true })
-          .filter((a) => a.effect?.getTiming().iterations !== Infinity)
-          .map((a) => a.finished.catch(() => {})),
+      // Build the letters while the heading's entrance animation runs, one
+      // per task so the page never freezes.
+      const chars = new Set(
+        (h1.textContent || '').toUpperCase().replace(/’/g, "'").replace(/\s/g, ''),
       );
+      for (const ch of chars) {
+        if (disposed) return;
+        makeLetter(ch);
+        await new Promise((r) => setTimeout(r));
+      }
       if (disposed) return;
-      build();
-      layout();
+      // Measure where the heading ends up without waiting for its entrance
+      // animation: jump the animation to its end, measure, jump back.
+      const atRest = (measure: () => void) => {
+        const running = h1
+          .getAnimations({ subtree: true })
+          .filter((a) => a.effect?.getTiming().iterations !== Infinity);
+        const times = running.map((a) => a.currentTime);
+        for (const a of running) a.currentTime = a.effect?.getComputedTiming().endTime ?? 0;
+        measure();
+        running.forEach((a, i) => (a.currentTime = times[i]));
+      };
+      atRest(() => {
+        build();
+        layout();
+      });
       heading.classList.add('has-3d-title');
 
       const state = { mx: 0, my: 0, tx: 0, ty: 0, px: -10, py: -10, near: false, visible: true };
@@ -379,7 +401,7 @@ export default function ContactTitle3D() {
       wake();
 
       const sizer = new ResizeObserver(() => {
-        layout();
+        atRest(layout);
         if (reduced) renderer.render(scene, camera);
       });
       sizer.observe(heading);
@@ -388,8 +410,10 @@ export default function ContactTitle3D() {
       const retext = new MutationObserver(() => {
         if (h1.textContent === text) return;
         text = h1.textContent;
-        build();
-        layout();
+        atRest(() => {
+          build();
+          layout();
+        });
         if (reduced) renderer.render(scene, camera);
       });
       retext.observe(h1, { childList: true, subtree: true, characterData: true });
