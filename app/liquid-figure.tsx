@@ -140,6 +140,8 @@ export default function LiquidFigure() {
     const canvas = ref.current;
     const hero = canvas?.closest<HTMLElement>('.hero');
     if (!canvas || !hero) return;
+    // Phones get no figure at all (hidden in CSS too), so WebGL never starts.
+    if (matchMedia('(max-width: 600px)').matches) return;
     const slot = hero.querySelector<HTMLElement>('.chrome');
     hero.classList.add('has-figure');
     const fail = () => hero.classList.add('figure-off');
