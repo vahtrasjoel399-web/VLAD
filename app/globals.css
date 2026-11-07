@@ -2628,3 +2628,36 @@ footer .footer-license:hover {
     overflow-x: auto;
   }
 }
+
+/* Phones: the liquid figure and the SMOLIN.FX logo sit above the headings
+   instead of over the letters, so the text stays readable. */
+@media (max-width: 600px) {
+  .hero h1 {
+    margin-top: calc(48vw + 16px);
+  }
+  .chrome {
+    top: 12px;
+    right: -2%;
+    width: 64%;
+    height: 48vw;
+  }
+  /* Padding, not h1 margin: a margin would collapse out of the heading box. */
+  .contacts .contact-heading {
+    padding-top: calc(34vw + 40px);
+  }
+  .contacts .contact-heading h1 {
+    margin-top: 0;
+  }
+  .store-cta {
+    padding-top: calc(26vw + 40px);
+  }
+  .store-cta-logo {
+    width: 48%;
+  }
+  .contacts .contact-logo {
+    top: 16px;
+    right: 0;
+    width: 62%;
+    height: auto;
+  }
+}
