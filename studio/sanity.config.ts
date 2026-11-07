@@ -36,6 +36,10 @@ export default defineConfig({
                   .title('Магазин — товары')
                   .defaultOrdering([{ field: 'order', direction: 'asc' }]),
               ),
+            S.listItem()
+              .title('Лицензия')
+              .id('license')
+              .child(S.document().schemaType('license').documentId('license')),
           ]),
     }),
     visionTool(),
@@ -49,6 +53,6 @@ export default defineConfig({
   schema: { types: schemaTypes },
   document: {
     newDocumentOptions: (templates) =>
-      templates.filter((template) => template.templateId !== 'portfolio'),
+      templates.filter((template) => !['portfolio', 'license'].includes(template.templateId)),
   },
 });

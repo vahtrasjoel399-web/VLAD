@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { productImage, type Product } from '@/lib/content';
+import { productImage, type Product, type StoreInfo } from '@/lib/content';
 import { checkoutLink } from '@/lib/payment-links';
+import BuyBox from './buy-box';
 import LiquidCanvas from './liquid-canvas';
 type Locale = 'en' | 'ru';
 
@@ -18,8 +19,6 @@ const COPY = {
     free: 'Free',
     soon: 'Coming soon',
     back: 'Back to work',
-    metaLeft: 'SMOLIN.FX // STORE_SEQUENCE_01',
-    metaRight: 'DIGITAL GOODS — EUR',
     ticker: ['PRESETS', 'LUTS', 'EFFECTS'],
     howTitle: 'HOW IT WORKS // 03 STEPS',
     steps: [
@@ -27,7 +26,7 @@ const COPY = {
       [
         'PAY',
         'Pay securely',
-        'Checkout opens in a new tab. Prices are in euros.',
+        'By card through Stripe. Prices are in euros.',
       ],
       [
         'GET',
@@ -35,13 +34,6 @@ const COPY = {
         'The download link arrives by email right after payment.',
       ],
     ],
-    facts: [
-      ['STATUS:', 'Store open.'],
-      ['DELIVERY:', 'Instant, by email.'],
-      ['FORMAT:', 'Digital files.'],
-    ],
-    vertical: 'SMOLIN.FX — DIGITAL GOODS — MOTION IN FOCUS',
-    ctaEyebrow: '[ SIGNAL ]',
     cta: 'QUESTIONS ABOUT A PACK?',
     ctaLink: 'WRITE TO ME',
   },
@@ -56,8 +48,6 @@ const COPY = {
     free: 'Бесплатно',
     soon: 'Скоро',
     back: 'Вернуться к работам',
-    metaLeft: 'SMOLIN.FX // STORE_SEQUENCE_01',
-    metaRight: 'ЦИФРОВЫЕ ТОВАРЫ — EUR',
     ticker: ['ПРЕСЕТЫ', 'LUT', 'ЭФФЕКТЫ'],
     howTitle: 'КАК ЭТО РАБОТАЕТ // 03 ШАГА',
     steps: [
@@ -65,7 +55,7 @@ const COPY = {
       [
         'PAY',
         'Оплатите безопасно',
-        'Оплата откроется в новой вкладке. Цены указаны в евро.',
+        'Картой через Stripe. Цены указаны в евро.',
       ],
       [
         'GET',
@@ -73,13 +63,6 @@ const COPY = {
         'Ссылка на скачивание придёт на почту сразу после оплаты.',
       ],
     ],
-    facts: [
-      ['СТАТУС:', 'Магазин открыт.'],
-      ['ДОСТАВКА:', 'Сразу, на почту.'],
-      ['ФОРМАТ:', 'Цифровые файлы.'],
-    ],
-    vertical: 'SMOLIN.FX — ЦИФРОВЫЕ ТОВАРЫ — ДВИЖЕНИЕ В ФОКУСЕ',
-    ctaEyebrow: '[ СИГНАЛ ]',
     cta: 'ВОПРОСЫ ПО НАБОРУ?',
     ctaLink: 'НАПИСАТЬ МНЕ',
   },
@@ -123,11 +106,13 @@ function ProductCard({
   index,
   locale,
   featured,
+  store,
 }: {
   product: Product;
   index: number;
   locale: Locale;
   featured: boolean;
+  store?: StoreInfo;
 }) {
   const [imageError, setImageError] = useState(false);
   const t = COPY[locale];
@@ -139,7 +124,8 @@ function ProductCard({
       : product.description;
   const image = imageError ? '' : productImage(product.image);
   const hoverImage = image ? productImage(product.imageHover) : '';
-  const checkout = checkoutLink(product);
+  // Old flow (payment link from Sanity) until the protected store is set up.
+  const checkout = store ? undefined : checkoutLink(product);
   const free = product.price === 0;
   const price =
     typeof product.price !== 'number'
@@ -204,7 +190,19 @@ function ProductCard({
           </div>
           {description && <p className="product-copy">{description}</p>}
         </div>
-        {checkout ? (
+        {store && product.available && price ? (
+          <BuyBox
+            product={product}
+            store={store}
+            locale={locale}
+            label={
+              <>
+                {free ? t.get : t.buy}
+                {!free && <span className="product-buy-price"> · {price}</span>}
+              </>
+            }
+          />
+        ) : checkout ? (
           <a
             className="product-buy"
             href={checkout}
@@ -229,12 +227,14 @@ function ProductCard({
 
 export default function StoreView({
   products,
+  store,
   locale,
   titleRef,
   onBack,
   onContact,
 }: {
   products: Product[];
+  store?: StoreInfo;
   locale: Locale;
   titleRef: React.RefObject<HTMLHeadingElement | null>;
   onBack: (event: React.MouseEvent<HTMLAnchorElement>) => void;
@@ -261,11 +261,6 @@ export default function StoreView({
         </defs>
       </svg>
       <div className="contact-heading">
-        <div className="store-meta" aria-hidden="true">
-          <span>{t.metaLeft}</span>
-          <span>+</span>
-          <span>{t.metaRight}</span>
-        </div>
         <div className="store-deco" aria-hidden="true">
           <span className="store-glow" />
           <img
@@ -303,6 +298,7 @@ export default function StoreView({
               index={index}
               locale={locale}
               featured={index === 0}
+              store={store}
             />
           ))}
         </div>
@@ -341,23 +337,6 @@ export default function StoreView({
               height="600"
               loading="lazy"
             />
-            <dl>
-              {t.facts.map(([term, value]) => (
-                <div key={term}>
-                  <dt>{term}</dt>
-                  <dd>{value}</dd>
-                </div>
-              ))}
-            </dl>
-            <span className="store-vertical" aria-hidden="true">
-              {t.vertical}
-            </span>
-            <span className="store-cross" aria-hidden="true">
-              +
-            </span>
-            <span className="store-cross" aria-hidden="true">
-              +
-            </span>
           </div>
         </div>
       </div>
@@ -378,7 +357,6 @@ export default function StoreView({
           height="799"
           loading="lazy"
         />
-        <span className="product-kind">{t.ctaEyebrow}</span>
         <strong>{t.cta}</strong>
         <span className="store-cta-link">
           {t.ctaLink} <ArrowUpRight size={18} />

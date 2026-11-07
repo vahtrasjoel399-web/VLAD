@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import {
-  ArrowDown,
   ArrowUpRight,
   ArrowRight,
   Copy,
@@ -17,6 +16,17 @@ import ThanksView from './thanks-view';
 import LiquidCanvas from './liquid-canvas';
 import LiquidFigure from './liquid-figure';
 type Page = 'works' | 'store' | 'contacts' | 'thanks';
+// What the thanks page shows after a protected-store payment.
+export type DownloadInfo =
+  | { pending: true }
+  | {
+      pending?: false;
+      url: string;
+      orderNo: string;
+      product: string;
+      email: string;
+      emailed: boolean;
+    };
 const PATHS: Record<Page, string> = {
   works: '/',
   store: '/store',
@@ -40,7 +50,6 @@ const COPY = {
     heroLineOne: 'BEYOND',
     heroLineTwo: 'THE FRAME.',
     chromeAlt: 'Sculptural liquid chrome form',
-    viewWork: 'View selected work',
     selectedSection: 'SELECTED WORK',
     worksAria: 'Selected work',
     collection: 'Selected automotive films',
@@ -81,6 +90,7 @@ const COPY = {
     motionOff: 'Pause motion',
     creatorLabel: 'VIDEO CREATOR',
     securePayment: 'Secure payment via Stripe',
+    license: 'License',
   },
   ru: {
     skip: 'К содержимому',
@@ -96,7 +106,6 @@ const COPY = {
     heroLineOne: 'ЗА',
     heroLineTwo: 'КАДРОМ.',
     chromeAlt: 'Скульптурная форма из жидкого хрома',
-    viewWork: 'Смотреть работы',
     selectedSection: 'ИЗБРАННЫЕ РАБОТЫ',
     worksAria: 'Избранные работы',
     collection: 'Избранные автомобильные ролики',
@@ -137,15 +146,18 @@ const COPY = {
     motionOff: 'Остановить движение',
     creatorLabel: 'ВИДЕОКРЕАТОР',
     securePayment: 'Безопасная оплата через Stripe',
+    license: 'Лицензия',
   },
 } as const;
 
 export default function PortfolioView({
   content,
   initialPage = 'works',
+  download,
 }: {
   content: Portfolio;
   initialPage?: Page;
+  download?: DownloadInfo;
 }) {
   const [page, setPage] = useState<Page>(initialPage);
   const [active, setActive] = useState<string | null>(null);
@@ -532,9 +544,6 @@ export default function PortfolioView({
                     ? content.descriptionRu || content.description
                     : content.description}
                 </p>
-                <a href="#works">
-                  {t.viewWork} <ArrowDown size={15} />
-                </a>
               </div>
             </section>
             <section id="works" aria-label={t.worksAria}>
@@ -618,6 +627,7 @@ export default function PortfolioView({
         ) : page === 'store' ? (
           <StoreView
             products={products}
+            store={content.store}
             locale={locale}
             titleRef={title}
             onBack={(e) => navigate(e, 'works')}
@@ -626,6 +636,7 @@ export default function PortfolioView({
         ) : page === 'thanks' ? (
           <ThanksView
             locale={locale}
+            download={download}
             titleRef={title}
             onStore={(e) => navigate(e, 'store')}
             onContact={(e) => navigate(e, 'contacts')}
@@ -806,6 +817,12 @@ export default function PortfolioView({
         <span className="footer-secure">
           <Lock size={11} aria-hidden="true" /> {t.securePayment}
         </span>
+        <a
+          className="footer-license"
+          href={locale === 'ru' ? '/license?lang=ru' : '/license'}
+        >
+          {t.license}
+        </a>
         <span>© {new Date().getFullYear()}</span>
       </footer>
     </main>

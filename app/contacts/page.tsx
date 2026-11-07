@@ -1,10 +1,10 @@
 import PortfolioView from '../portfolio-view';
-import { getContent } from '@/lib/content';
+import { getSiteContent } from '@/lib/store/content';
 export const dynamic = 'force-dynamic';
 export default async function Contacts() {
   try {
     return (
-      <PortfolioView content={await getContent()} initialPage="contacts" />
+      <PortfolioView content={await getSiteContent()} initialPage="contacts" />
     );
   } catch {
     return (

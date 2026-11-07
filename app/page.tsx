@@ -1,9 +1,9 @@
 import PortfolioView from './portfolio-view';
-import { getContent } from '@/lib/content';
+import { getSiteContent } from '@/lib/store/content';
 export const dynamic = 'force-dynamic';
 export default async function Home() {
   try {
-    return <PortfolioView content={await getContent()} />;
+    return <PortfolioView content={await getSiteContent()} />;
   } catch {
     return (
       <main className="error-page">

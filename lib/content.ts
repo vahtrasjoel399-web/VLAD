@@ -35,7 +35,11 @@ export type Product = {
   isNew?: boolean;
   checkoutUrl?: string;
   order: number;
+  // Set by the server when the protected store runs: a file is uploaded.
+  available?: boolean;
 };
+// Present only when the protected store (Stripe + private files) is set up.
+export type StoreInfo = { ready: true; licenseVersion: string };
 export type Portfolio = {
   name: string;
   demo: boolean;
@@ -49,6 +53,7 @@ export type Portfolio = {
   works: Work[];
   logos: Logo[];
   products: Product[];
+  store?: StoreInfo;
 };
 export const demoContent: Portfolio = fallback;
 export function safeLink(value: string | undefined) {

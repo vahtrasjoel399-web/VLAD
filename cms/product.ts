@@ -26,10 +26,10 @@ export default {
     },
     {
       name: 'checkoutUrl',
-      title: 'Ссылка на оплату Stripe',
+      title: 'Старая ссылка на оплату (Stripe Payment Link)',
       type: 'url',
       description:
-        'Stripe → Payment Links → Create → скопировать ссылку (https://buy.stripe.com/...). Для бесплатного товара сюда можно вставить ссылку на скачивание. Пока поле пустое, на сайте вместо кнопки будет «Скоро».',
+        'Нужна только до запуска защищённого магазина. Потом оплата и выдача файла работают сами, это поле не используется.',
       validation: (Rule: any) => Rule.uri({ scheme: ['https'] }),
     },
     {
@@ -85,15 +85,14 @@ export default {
       title: 'title',
       category: 'category',
       price: 'price',
-      link: 'checkoutUrl',
       media: 'image',
     },
-    prepare({ title, category, price, link, media }: any) {
+    prepare({ title, category, price, media }: any) {
       const cost =
         typeof price !== 'number' ? '' : price === 0 ? 'Free' : `€${price}`;
       return {
         title,
-        subtitle: [category, cost, link ? '' : 'нет ссылки на оплату']
+        subtitle: [category, cost]
           .filter(Boolean)
           .join(' · '),
         media,

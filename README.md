@@ -69,3 +69,26 @@ Mux обрабатывает исходник в адаптивный поток
 Sintel Trailer © Blender Foundation, https://durian.blender.org/ , Creative Commons Attribution 3.0: https://creativecommons.org/licenses/by/3.0/ . Источник файла: https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4 . Постеры — извлечённые кадры трейлера (разные моменты); видео не обрезано. Демо-подписи описывают кадры и не приписывают авторство владельцу портфолио. Хромированная иллюстрация создана для этого сайта с помощью ImageGen. Текстовые демо-логотипы не обозначают реальные сотрудничества.
 
 # VLAD
+
+## Защищённый магазин (Stripe + закрытые файлы)
+
+Пока переменные ниже не заданы, магазин работает по-старому: кнопка ведёт на ссылку оплаты из Sanity. Как только они заданы, включается защищённая продажа:
+
+- перед оплатой обязательна галочка «Я согласен с условиями лицензии» (`/license`, текст и версия в Sanity → «Лицензия»); время согласия, версия условий и email сохраняются в заказе и в метаданных платежа Stripe;
+- оплата через Stripe Checkout, цена берётся из Sanity на сервере;
+- после оплаты (Stripe webhook с проверкой подписи) покупатель получает личную ссылку: страница «Спасибо» и письмо; ссылка живёт 48 часов, до 5 скачиваний;
+- файл отдаётся только по кнопке «Скачать» (почтовые сканеры не тратят скачивания); каждое скачивание логируется (время, IP, страна); 2 страны или 3 IP — ссылка блокируется, заказ помечается;
+- в .cube, .xmp, .lrtemplate добавляется комментарий с email и номером заказа (данные LUT не меняются), в zip — LICENSE.txt, номер заказа в имени файла; файлы больше 4 МБ отдаются через ссылку хранилища на 60 секунд;
+- полный возврат денег в Stripe автоматически отключает ссылки;
+- `/admin/orders` (пароль): загрузка файлов товаров, заказы, подозрительные, лог скачиваний, «Отозвать», «Новая ссылка», «Новая ссылка + письмо». `/admin` по-прежнему ведёт в Sanity Studio.
+
+### Настройка
+
+1. **Supabase**: новый проект (регион Frankfurt). SQL Editor → выполнить `supabase/migrations/20261107000000_store.sql` (таблицы, функция, приватный bucket `products`). На бесплатном тарифе один файл до 50 МБ.
+2. **Stripe** (аккаунт Влада): Developers → Webhooks → Add endpoint `https://smolinfx.com/api/stripe/webhook`, события `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`. Settings → Emails → включить квитанции. Сначала тестовые ключи.
+3. **Resend**: добавить домен smolinfx.com, внести выданные DNS-записи у регистратора, создать API key.
+4. **Vercel → Environment Variables** (все серверные, см. `.env.example`): `SITE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `STORE_SECRET` (32+ случайных символа), `ADMIN_PASSWORD`, `RESEND_API_KEY`, `EMAIL_FROM`. Потом Redeploy.
+5. **Sanity Studio**: в `studio/.env` `SANITY_STUDIO_SITE_URL=https://smolinfx.com`, затем `cd studio && npx sanity deploy`. Открыть «Лицензия» (черновик уже заполнен), проверить текст, Publish.
+6. Для каждого товара: Publish в Sanity → кнопка «Загрузить или заменить файл» → загрузить файл в `/admin/orders`.
+
+Локальная проверка: `npx supabase start` (порты 55321/55322, см. `supabase/config.toml`), ключи из вывода команды — в переменные окружения `next dev`.

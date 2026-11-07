@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import PortfolioView from '../portfolio-view';
-import { getContent } from '@/lib/content';
+import { getSiteContent } from '@/lib/store/content';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Store — SMOLIN.FX',
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 export default async function Store() {
   try {
-    return <PortfolioView content={await getContent()} initialPage="store" />;
+    return <PortfolioView content={await getSiteContent()} initialPage="store" />;
   } catch {
     return (
       <main className="error-page">

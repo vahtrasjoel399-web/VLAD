@@ -1564,8 +1564,12 @@ footer {
   font-weight: 500;
   letter-spacing: 0.02em;
 }
-a.product-buy {
+a.product-buy,
+button.product-buy {
+  width: 100%;
   color: #090909;
+  font-family: inherit;
+  cursor: pointer;
   background: linear-gradient(
     100deg,
     #a4a4a4 0%,
@@ -1583,14 +1587,18 @@ a.product-buy {
     border-color 0.3s ease;
 }
 a.product-buy:hover,
-a.product-buy:focus-visible {
+a.product-buy:focus-visible,
+button.product-buy:not(:disabled):hover,
+button.product-buy:not(:disabled):focus-visible {
   border-color: #fff;
   background-position: 100% 0;
 }
-a.product-buy svg {
+a.product-buy svg,
+button.product-buy svg {
   transition: transform 0.3s var(--ease);
 }
-a.product-buy:hover svg {
+a.product-buy:hover svg,
+button.product-buy:not(:disabled):hover svg {
   transform: translate(3px, -3px);
 }
 .product-buy-price {
@@ -1664,16 +1672,6 @@ a.product-buy:hover svg {
   margin-right: 12px;
   background: conic-gradient(#aaa 25%, transparent 0 50%, #aaa 0 75%, transparent 0)
     0 0 / 8px 8px;
-}
-.store-meta {
-  position: absolute;
-  inset: -44px 0 auto;
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  color: #777;
-  font: 10px monospace;
-  letter-spacing: 1px;
 }
 .store-ticker {
   overflow: hidden;
@@ -1772,10 +1770,8 @@ a.product-buy:hover svg {
 .store-side {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 28px;
-  padding: 26px 34px 26px 0;
+  padding: 26px 0;
 }
 /* Rendered in Blender: art/chrome-globe.py. */
 .store-globe {
@@ -1783,48 +1779,6 @@ a.product-buy:hover svg {
   max-width: 260px;
   height: auto;
   justify-self: center;
-}
-.store-side dl {
-  display: grid;
-  gap: 18px;
-  margin: 0;
-  text-align: right;
-}
-.store-side dt {
-  font: 10px monospace;
-  letter-spacing: 1px;
-  color: #eee;
-}
-.store-side dd {
-  margin: 5px 0 0;
-  color: #999;
-  font-size: 12px;
-  line-height: 1.5;
-}
-.store-vertical {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  writing-mode: vertical-rl;
-  rotate: 180deg;
-  text-align: center;
-  color: #666;
-  font: 9px monospace;
-  letter-spacing: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.store-cross {
-  position: absolute;
-  top: -4px;
-  left: -30px;
-  color: #666;
-  font: 14px monospace;
-}
-.store-cross + .store-cross {
-  top: auto;
-  bottom: -4px;
 }
 /* Liquid-metal noise seen through a halftone dot screen, with scanlines. */
 .store-cta {
@@ -1979,9 +1933,6 @@ a.product-buy:hover svg {
   .store-side {
     max-width: 520px;
   }
-  .store-cross {
-    display: none;
-  }
 }
 @media (max-width: 600px) {
   .store {
@@ -1989,9 +1940,6 @@ a.product-buy:hover svg {
   }
   .store .contact-heading h1 {
     font-size: clamp(56px, 19vw, 132px);
-  }
-  .store-meta span + span {
-    display: none;
   }
   .store-steps li {
     grid-template-columns: 84px 1fr;
@@ -2375,4 +2323,308 @@ nav.header-nav a[aria-current='page'] {
 }
 .contact-teaser:hover .teaser-liquid {
   opacity: 0.7;
+}
+
+/* Protected store: license checkbox above the buy button. */
+.buy-box {
+  display: grid;
+  gap: 12px;
+}
+.buy-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  padding-top: 4px;
+  color: #a8a8a8;
+  font-size: 13px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+.buy-consent input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #e8e8e8;
+  cursor: pointer;
+}
+.buy-consent a {
+  color: #eee;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+button.product-buy:disabled {
+  color: #8a8a8a;
+  background: #141414;
+  border-color: #333;
+  cursor: not-allowed;
+}
+.buy-email {
+  min-height: 48px;
+  padding: 0 14px;
+  color: #eee;
+  font: inherit;
+  font-size: 14px;
+  background: #0d0d0d;
+  border: 1px solid #333;
+}
+.buy-email:focus {
+  outline: none;
+  border-color: #aaa;
+}
+.buy-error {
+  color: #ff8f8f;
+  font-size: 13px;
+}
+.buy-done {
+  display: block;
+  padding: 14px 0;
+  color: #eee;
+  font-size: 14px;
+}
+.thanks-download {
+  display: grid;
+  gap: 12px;
+  max-width: 460px;
+  margin: 8px 0 24px;
+}
+footer .footer-license {
+  color: #999;
+}
+footer .footer-license:hover {
+  color: #fff;
+}
+
+/* Plain pages: download, license, store admin. */
+.plain-page {
+  max-width: 720px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+  color: #ddd;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.plain-page.is-wide {
+  max-width: 1280px;
+}
+.plain-page h1 {
+  margin: 48px 0 24px;
+  font-size: clamp(36px, 7vw, 72px);
+  line-height: 1.05;
+}
+.plain-page h2 {
+  margin: 32px 0 10px;
+  color: #fff;
+  font-size: 18px;
+}
+.plain-page a {
+  color: #eee;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.plain-page a.plain-brand {
+  font: 12px monospace;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+}
+.plain-facts {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 24px;
+}
+.plain-facts div {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #262626;
+}
+.plain-facts dt {
+  min-width: 170px;
+  color: #888;
+}
+.plain-note {
+  margin: 14px 0;
+  color: #999;
+  font-size: 13px;
+}
+.plain-alert {
+  margin: 16px 0;
+  padding: 12px 14px;
+  color: #ffd7d7;
+  border: 1px solid #5a2a2a;
+}
+.plain-ok {
+  color: #b9f0c2;
+}
+.plain-list {
+  padding-left: 20px;
+  list-style: disc;
+}
+.plain-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 28px;
+  color: #090909;
+  font: inherit;
+  font-weight: 600;
+  background: #e8e8e8;
+  border: 1px solid #e8e8e8;
+  cursor: pointer;
+  transition: background-color 0.16s ease;
+}
+.plain-button:hover {
+  background: #fff;
+}
+.plain-button.is-small {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #ddd;
+  background: none;
+  border-color: #444;
+}
+.plain-button.is-small:hover {
+  border-color: #aaa;
+}
+.plain-form {
+  display: grid;
+  gap: 14px;
+  max-width: 320px;
+}
+.plain-form label {
+  display: grid;
+  gap: 6px;
+  color: #999;
+  font-size: 13px;
+}
+.plain-form input,
+.admin-filters input {
+  min-height: 44px;
+  padding: 0 12px;
+  color: #eee;
+  font: inherit;
+  background: #0d0d0d;
+  border: 1px solid #333;
+}
+.admin-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.plain-lang {
+  display: flex;
+  gap: 14px;
+  font: 12px monospace;
+}
+.plain-page .plain-lang a {
+  color: #777;
+  text-decoration: none;
+}
+.plain-page .plain-lang a[aria-current='page'] {
+  color: #fff;
+}
+.license-text ul {
+  padding-left: 20px;
+  list-style: disc;
+}
+.license-text li + li {
+  margin-top: 6px;
+}
+.license-text p {
+  margin: 8px 0;
+}
+.admin-section {
+  margin-top: 48px;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.admin-table th,
+.admin-table td {
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid #222;
+}
+.admin-table th {
+  color: #777;
+  font-weight: 400;
+}
+.admin-table tr.is-target td {
+  background: #1a1a1a;
+}
+.admin-ua {
+  max-width: 280px;
+  overflow: hidden;
+  color: #777;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-warn {
+  color: #ff9b9b;
+}
+.admin-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #999;
+  font-size: 12px;
+}
+.admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+.plain-page .admin-filters a {
+  color: #888;
+  text-decoration: none;
+}
+.plain-page .admin-filters a[aria-current='page'] {
+  color: #fff;
+}
+.admin-order {
+  border-bottom: 1px solid #222;
+}
+.admin-order.is-flagged {
+  border-left: 2px solid #b34a4a;
+  padding-left: 10px;
+}
+.admin-order summary {
+  display: grid;
+  grid-template-columns: 110px 110px minmax(0, 1.2fr) minmax(0, 1.4fr) 80px 50px 110px;
+  gap: 12px;
+  padding: 12px 0;
+  font-size: 13px;
+  cursor: pointer;
+  list-style: none;
+}
+.admin-order summary .admin-warn {
+  grid-column: 1 / -1;
+}
+.admin-order-body {
+  padding: 0 0 20px;
+}
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+@media (max-width: 900px) {
+  .admin-order summary {
+    grid-template-columns: 1fr 1fr;
+  }
+  .admin-table {
+    display: block;
+    overflow-x: auto;
+  }
 }
