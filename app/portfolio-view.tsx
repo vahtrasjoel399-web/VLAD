@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ArrowUpRight,
-  ArrowRight,
   Copy,
   Check,
   Lock,
@@ -754,13 +753,6 @@ export default function PortfolioView({
               </div>
             </div>
             </div>
-            <a
-              className="back-link reveal"
-              href="/"
-              onClick={(e) => navigate(e, 'works')}
-            >
-              {t.back} <ArrowRight size={16} />
-            </a>
           </section>
         )}
       </div>

@@ -2688,3 +2688,13 @@ html:lang(ru) .contact-main .contact-heading h1 {
     font-size: 31vw;
   }
 }
+@media (max-width: 420px) {
+  /* Keep the email address on one line on phones. */
+  .contact-email > a {
+    font-size: 15px;
+    overflow-wrap: normal;
+  }
+  .contact-email > a svg {
+    display: none;
+  }
+}
